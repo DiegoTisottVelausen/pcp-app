@@ -1,4 +1,4 @@
-export default function KpiCard({ titulo, valor, modoTV }) {
+export default function KpiCard({ titulo, valor, modoTv }) {
   const numero = Number(valor)
   const alerta =
     (titulo === "Atraso Crítico" && numero > 0) ||

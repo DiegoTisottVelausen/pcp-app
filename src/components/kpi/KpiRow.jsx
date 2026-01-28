@@ -16,6 +16,7 @@ export default function KpiRow({ capacidade, atrasadas, criticas, modoTv }) {
       <KpiCard
         titulo="Atrasados"
         valor={atrasadas}
+        modoTv={modoTv}
       />
 
       <KpiCard
@@ -27,6 +28,7 @@ export default function KpiRow({ capacidade, atrasadas, criticas, modoTv }) {
       <KpiCard
         titulo="Capacidade Utilizada"
         valor={`${capacidade.toFixed(0)}%`}
+        modoTv={modoTv}
       />
     </div>
   )
