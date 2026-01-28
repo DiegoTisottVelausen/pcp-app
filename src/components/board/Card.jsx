@@ -7,10 +7,12 @@ export default function Card({
   produto,
   operacao,
   tempo,
-  dataEntrega
+  dataEntrega,
+  modoTv
 }) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id
+      id,
+      disabled: modoTv
     })
 
   // ✅ PRIMEIRO calcula

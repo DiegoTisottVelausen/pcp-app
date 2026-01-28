@@ -3,7 +3,7 @@ import Column from "./Column"
 
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
-export default function Board({ ordens, setOrdens, setMensagem }) {
+export default function Board({ ordens, setOrdens, setMensagem, modoTV }) {
   
   const largura = window.innerWidth
 
@@ -72,6 +72,7 @@ export default function Board({ ordens, setOrdens, setMensagem }) {
               key={dia}
               dia={dia}
               ordens={ordens.filter(o => o.dia === dia)}
+              modoTv={modoTv}
             />
           ))}
         </div>

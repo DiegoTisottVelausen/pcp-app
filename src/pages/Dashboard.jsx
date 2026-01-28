@@ -25,6 +25,7 @@ export default function Dashboard() {
 
           return true // todos
     })
+  const [modoTv, setModoTv] = useState(false)
 
 
     useEffect(() => {carregarPcp().then(dados => 
@@ -49,76 +50,119 @@ export default function Dashboard() {
         }, [ordens])
 
 
+    useEffect(() => 
+      {
+        if (!modoTv) return
+
+      const intervalo = setInterval(() => 
+        {
+          carregarPcp().then(setOrdens)
+        }, 30000) // 30s
+
+      return () => clearInterval(intervalo)
+      }, [modoTv])
+
+
   return (
-    <div>
-      <h1 style={{ fontSize: 28, marginBottom: 24 }}>PCP</h1>
-      <KpiRow capacidade={capacidadePercentual} atrasadas={atrasadas} criticas={criticas}/>
+    
+    <div 
+      style=
+        {{
+          padding: modoTv ? "32px 48px" : "24px 32px",
+          fontSize: modoTv ? 18 : 14
+        }}
+    >
 
-      {mensagem && (
-        <div
-          style={{
-            background: "#2b1a1a",
-            color: "#ffb3b3",
-            padding: 8,
-            borderRadius: 6,
-            marginBottom: 12
-          }}
-        >
-          {mensagem}
-        </div>
-      )}
+          <h1 style={{ fontSize: modoTv ? 36 : 28 }}>PCP</h1>
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-        <button
-          onClick={() => setFiltro("todos")}
-          style={{
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: filtro === "todos" ? "2px solid #000" : "1px solid #ccc",
-            background: filtro === "todos" ? "#eee" : "#fff",
-            cursor: "pointer"
-          }}
-        >
-          Todos
-        </button>
+          <KpiRow
+            capacidade={capacidadePercentual}
+            atrasadas={atrasadas}
+            criticas={criticas}
+            modoTv={modoTv}
+          />
 
-        <button
-          onClick={() => setFiltro("atrasados")}
-          style={{
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: filtro === "atrasados" ? "2px solid #ff4d4d" : "1px solid #ccc",
-            background: filtro === "atrasados" ? "#ffecec" : "#fff",
-            cursor: "pointer"
-          }}
-        >
-          Atrasados
-        </button>
+          {mensagem && (
+            <div
+              style={{
+                background: "#2b1a1a",
+                color: "#ffb3b3",
+                padding: 8,
+                borderRadius: 6,
+                marginBottom: 12
+              }}
+            >
+              {mensagem}
+            </div>
+          )}
 
-        <button
-          onClick={() => setFiltro("criticos")}
-          style={{
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: filtro === "criticos" ? "2px solid #d10000" : "1px solid #ccc",
-            background: filtro === "criticos" ? "#ffd6d6" : "#fff",
-            cursor: "pointer"
-          }}
-        >
-          Críticos
-        </button>
-      </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+            <strong>{modoTv ? "Modo TV / Chão de Fábrica" : "Modo Normal"}</strong>
 
-      <h2 style={{ fontSize: 20, margin: "24px 0 12px" }}>
-        Programação Semanal
-      </h2>
+            <button
+              onClick={() => setModoTv(prev => !prev)}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 6,
+                border: "1px solid #444",
+                cursor: "pointer"
+              }}
+            >
+              {modoTv ? "Sair do Modo TV" : "Ativar Modo TV"}
+            </button>
+          </div>
 
-      <Board
-        ordens={ordensFiltradas}
-        setOrdens={setOrdens}
-        setMensagem={setMensagem}
-      />
+          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+            <button
+              onClick={() => setFiltro("todos")}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 6,
+                border: filtro === "todos" ? "2px solid #000" : "1px solid #ccc",
+                background: filtro === "todos" ? "#eee" : "#fff",
+                cursor: "pointer"
+              }}
+            >
+              Todos
+            </button>
 
+            <button
+              onClick={() => setFiltro("atrasados")}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 6,
+                border: filtro === "atrasados" ? "2px solid #ff4d4d" : "1px solid #ccc",
+                background: filtro === "atrasados" ? "#ffecec" : "#fff",
+                cursor: "pointer"
+              }}
+            >
+              Atrasados
+            </button>
+
+            <button
+              onClick={() => setFiltro("criticos")}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 6,
+                border: filtro === "criticos" ? "2px solid #d10000" : "1px solid #ccc",
+                background: filtro === "criticos" ? "#ffd6d6" : "#fff",
+                cursor: "pointer"
+              }}
+            >
+              Críticos
+            </button>
+          </div>
+
+          <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
+            Programação Semanal
+          </h2>
+
+          <Board
+            ordens={ordensFiltradas}
+            setOrdens={setOrdens}
+            setMensagem={setMensagem}
+            modoTv={modoTv}
+          />
 
     </div>
   )

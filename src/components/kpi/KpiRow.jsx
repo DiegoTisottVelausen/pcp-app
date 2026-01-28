@@ -1,6 +1,6 @@
 import KpiCard from "./KpiCard"
 
-export default function KpiRow({ capacidade, atrasadas, criticas }) {
+export default function KpiRow({ capacidade, atrasadas, criticas, modoTv }) {
   return (
       <div
         style={{
@@ -21,6 +21,7 @@ export default function KpiRow({ capacidade, atrasadas, criticas }) {
       <KpiCard
         titulo="Atraso Crítico"
         valor={criticas}
+        modoTv={modoTv}
       />
 
       <KpiCard

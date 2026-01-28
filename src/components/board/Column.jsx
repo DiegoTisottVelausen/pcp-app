@@ -3,7 +3,7 @@ import Card from "./Card"
 import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
 
-export default function Column({ dia, ordens }) {
+export default function Column({ dia, ordens, modoTv }) {
   const { setNodeRef } = useDroppable({
     id: dia
   })
@@ -53,6 +53,7 @@ return (
                 operacao={ordem.operacao}
                 tempo={ordem.tempo}
                 dataEntrega={ordem.dataEntrega}
+                modoTv={modoTv}
             />
 
         ))}

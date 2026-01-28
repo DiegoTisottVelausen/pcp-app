@@ -1,4 +1,4 @@
-export default function KpiCard({ titulo, valor }) {
+export default function KpiCard({ titulo, valor, modoTV }) {
   const numero = Number(valor)
   const alerta =
     (titulo === "Atraso Crítico" && numero > 0) ||
@@ -18,7 +18,7 @@ export default function KpiCard({ titulo, valor }) {
       <p style={{ margin: 0, fontSize: 14 }}>{titulo}</p>
       <strong
         style={{
-          fontSize: 24,
+          fontSize: modoTv ? 36 : 24,
           color: alerta ? "#ff4d4d" : "inherit"
         }}
       >
