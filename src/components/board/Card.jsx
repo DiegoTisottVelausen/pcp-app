@@ -16,8 +16,12 @@ export default function Card({
   // ✅ PRIMEIRO calcula
     const atrasada = estaAtrasada({ dataEntrega })
     const diasAtraso = diasDeAtraso({ dataEntrega })
-    const nivel = nivelDeAtraso({ dataEntrega })
-
+    const nivel = nivelDeAtraso({
+                                  dataEntrega,
+                                  tempo,
+                                  produto,
+                                  operacao
+                                })
 
   // ✅ DEPOIS usa
     const cores = {

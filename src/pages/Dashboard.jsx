@@ -113,7 +113,12 @@ export default function Dashboard() {
         Programação Semanal
       </h2>
 
-      <Board ordens={ordensFiltradas} setOrdens={setOrdens} />
+      <Board
+        ordens={ordensFiltradas}
+        setOrdens={setOrdens}
+        setMensagem={setMensagem}
+      />
+
 
     </div>
   )
