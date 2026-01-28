@@ -3,27 +3,42 @@ import { carregarPcp, salvarPcp } from "../services/pcpService"
 import KpiRow from "../components/kpi/KpiRow"
 import Board from "../components/board/Board"
 import { pcpData } from "../data/pcpFakeData"
-import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico } from "../utils/pcpCalculations"
+import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, estaAtrasada, nivelDeAtraso } from "../utils/pcpCalculations"
 
 export default function Dashboard() {
+    
   const [ordens, setOrdens] = useState([])
   const [mensagem, setMensagem] = useState("")
+  const capacidadePercentual = calcularCapacidadePercentual(ordens)
+  const atrasadas = contarAtrasadas(ordens)
+  const criticas = contarAtrasoCritico(ordens)
+  const [filtro, setFiltro] = useState("todos")
+  const ordensFiltradas = ordens.filter(ordem => 
+    {
+      if (filtro === "atrasados") {
+            return estaAtrasada(ordem)
+          }
 
-  const capacidadePercentual =
-    calcularCapacidadePercentual(ordens)
+      if (filtro === "criticos") {
+            return nivelDeAtraso(ordem) === "critico"
+          }
 
-    const atrasadas = contarAtrasadas(ordens)
-    const criticas = contarAtrasoCritico(ordens)
-
-    useEffect(() => {
-        carregarPcp().then(dados => {
-            if (dados.length === 0) {
-            setOrdens(pcpData)
-            salvarPcp(pcpData)
-            } else {
-            setOrdens(dados)
-            }
+          return true // todos
     })
+
+
+    useEffect(() => {carregarPcp().then(dados => 
+      {
+            if (dados.length === 0) 
+            {
+              setOrdens(pcpData)
+              salvarPcp(pcpData)
+            } 
+            else 
+            {
+              setOrdens(dados)
+            }
+      })
     }, [])
 
     useEffect(() => 
@@ -53,15 +68,53 @@ export default function Dashboard() {
         </div>
       )}
 
+      <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+        <button
+          onClick={() => setFiltro("todos")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: 6,
+            border: filtro === "todos" ? "2px solid #000" : "1px solid #ccc",
+            background: filtro === "todos" ? "#eee" : "#fff",
+            cursor: "pointer"
+          }}
+        >
+          Todos
+        </button>
+
+        <button
+          onClick={() => setFiltro("atrasados")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: 6,
+            border: filtro === "atrasados" ? "2px solid #ff4d4d" : "1px solid #ccc",
+            background: filtro === "atrasados" ? "#ffecec" : "#fff",
+            cursor: "pointer"
+          }}
+        >
+          Atrasados
+        </button>
+
+        <button
+          onClick={() => setFiltro("criticos")}
+          style={{
+            padding: "6px 12px",
+            borderRadius: 6,
+            border: filtro === "criticos" ? "2px solid #d10000" : "1px solid #ccc",
+            background: filtro === "criticos" ? "#ffd6d6" : "#fff",
+            cursor: "pointer"
+          }}
+        >
+          Críticos
+        </button>
+      </div>
+
       <h2 style={{ fontSize: 20, margin: "24px 0 12px" }}>
         Programação Semanal
       </h2>
 
-      <Board
-        ordens={ordens}
-        setOrdens={setOrdens}
-        setMensagem={setMensagem}
-      />
+      <Board ordens={ordensFiltradas} setOrdens={setOrdens} />
+
     </div>
   )
 }
