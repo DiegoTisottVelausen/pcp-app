@@ -1,0 +1,28 @@
+import KpiCard from "./KpiCard"
+
+export default function KpiRow({ capacidade, atrasadas, criticas }) {
+  return (
+    <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+      <KpiCard titulo="Pedidos Abertos" valor={0} />
+      <KpiCard titulo="OPs em Produção" valor={0} />
+
+      <KpiCard
+        titulo="Atrasados"
+        valor={atrasadas}
+      />
+
+      <KpiCard
+        titulo="Atraso Crítico"
+        valor={criticas}
+      />
+
+      <KpiCard
+        titulo="Capacidade Utilizada"
+        valor={`${capacidade.toFixed(0)}%`}
+      />
+    </div>
+  )
+}
+
+
+
