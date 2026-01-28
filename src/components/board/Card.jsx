@@ -40,13 +40,15 @@ export default function Card({
     }
 
     const style = {
-        transform: CSS.Translate.toString(transform),
-        padding: 8,
-        background: cores[nivel].background,
-        border: `2px solid ${cores[nivel].border}`,
-        borderRadius: 6,
-        cursor: "grab"
+      transform: CSS.Translate.toString(transform),
+      padding: 12,
+      fontSize: 14,
+      background: cores[nivel].background,
+      border: `2px solid ${cores[nivel].border}`,
+      borderRadius: 8,
+      cursor: "grab"
     }
+
 
 
   return (

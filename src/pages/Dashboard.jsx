@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 style={{ marginBottom: 24 }}>PCP</h1>
+      <h1 style={{ fontSize: 28, marginBottom: 24 }}>PCP</h1>
       <KpiRow capacidade={capacidadePercentual} atrasadas={atrasadas} criticas={criticas}/>
 
       {mensagem && (
@@ -53,8 +53,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      <h2 style={{ margin: "24px 0 12px" }}>
-          Programação Semanal
+      <h2 style={{ fontSize: 20, margin: "24px 0 12px" }}>
+        Programação Semanal
       </h2>
 
       <Board

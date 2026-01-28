@@ -4,6 +4,14 @@ import Column from "./Column"
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
 export default function Board({ ordens, setOrdens, setMensagem }) {
+  
+  const largura = window.innerWidth
+
+  let colunas = 5
+  if (largura <= 1200) colunas = 3
+  if (largura <= 768) colunas = 2
+
+  
   function handleDragEnd(event) {
   const { active, over } = event
 
@@ -54,7 +62,7 @@ export default function Board({ ordens, setOrdens, setMensagem }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
+            gridTemplateColumns: `repeat(${colunas}, 1fr)`,
             gap: 16
           }}
         >

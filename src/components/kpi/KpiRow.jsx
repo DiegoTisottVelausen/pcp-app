@@ -5,7 +5,7 @@ export default function KpiRow({ capacidade, atrasadas, criticas }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
           gap: 16,
           marginBottom: 24
         }}
