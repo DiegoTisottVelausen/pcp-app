@@ -51,7 +51,14 @@ export default function Board({ ordens, setOrdens, setMensagem }) {
       <h3>Programação Semanal</h3>
 
       <DndContext onDragEnd={handleDragEnd}>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: 16
+          }}
+        >
+
           {dias.map(dia => (
             <Column
               key={dia}

@@ -2,7 +2,14 @@ import KpiCard from "./KpiCard"
 
 export default function KpiRow({ capacidade, atrasadas, criticas }) {
   return (
-    <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 16,
+          marginBottom: 24
+        }}
+      >
       <KpiCard titulo="Pedidos Abertos" valor={0} />
       <KpiCard titulo="OPs em Produção" valor={0} />
 

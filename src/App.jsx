@@ -1,12 +1,17 @@
 import Dashboard from "./pages/Dashboard"
 
-function App() {
+export default function App() {
   return (
-    <>
-      <h1>PCP</h1>
-      <Dashboard/>
-    </>
+    <div
+      style={{
+        maxWidth: 1400,
+        margin: "0 auto",
+        padding: "24px 32px",
+        fontFamily: "Inter, system-ui, sans-serif"
+      }}
+    >
+      <Dashboard />
+    </div>
   )
 }
 
-export default App
