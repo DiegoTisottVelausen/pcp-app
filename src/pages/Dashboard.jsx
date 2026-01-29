@@ -81,10 +81,9 @@ async function sincronizarComErp() {
     setOrdens(ordensPcp)
     await salvarPcp(ordensPcp)
     setMensagem("Dados atualizados a partir do ERP")
-
   } catch (erro) {
-    console.error("Falha ao sincronizar com ERP", erro)
-    setMensagem("Erro ao buscar dados do ERP")
+    console.error("Erro ao sincronizar com ERP", erro)
+    setMensagem("Falha ao atualizar dados do ERP")
   }
 }
 
@@ -141,6 +140,7 @@ async function sincronizarComErp() {
           </div>
 
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+
             <button
               onClick={() => setFiltro("todos")}
               style={{
@@ -179,14 +179,17 @@ async function sincronizarComErp() {
             >
               Críticos
             </button>
+
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            
             <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
               Programação Semanal
             </h2>
 
             <div style={{ display: "flex", gap: 8 }}>
+
               <button
                 onClick={sincronizarComErp}
                 style={{
@@ -214,7 +217,9 @@ async function sincronizarComErp() {
               >
                 Imprimir / PDF
               </button>
+
             </div>
+
           </div>
 
 
