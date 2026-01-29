@@ -35,37 +35,7 @@ const [modoTv, setModoTv] = useState(false)
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-    useEffect(() => {
-      async function carregarDadosIniciais() {
-        try {
-          // 1) busca ordens do ERP
-          const ordensErp = await carregarOrdensErp()
-
-          // 2) converte para o formato do PCP
-          const ordensPcp = ordensErp.map(o => ({
-            id: o.id,
-            produto: o.produto,
-            operacao: o.operacao,
-            tempo: o.horas,
-            dia: diaDaSemana(o.dataEntrega),
-            dataEntrega: o.dataEntrega
-          }))
-
-
-          // 3) joga no estado da tela
-          setOrdens(ordensPcp)
-
-          // 4) salva no backend do PCP também
-          await salvarPcp(ordensPcp)
-
-        } catch (erro) {
-            console.error("Falha ao carregar dados do ERP", erro)
-            setMensagem("Erro ao carregar dados do ERP")
-        }
-      }
-
-      carregarDadosIniciais()
-    }, [])
+    useEffect(() => {sincronizarComErp()}, [])
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,6 +61,32 @@ const [modoTv, setModoTv] = useState(false)
 
       return () => clearInterval(intervalo)
       }, [modoTv])
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+async function sincronizarComErp() {
+  try {
+    const ordensErp = await carregarOrdensErp()
+
+    const ordensPcp = ordensErp.map(o => ({
+      id: o.id,
+      produto: o.produto,
+      operacao: o.operacao,
+      tempo: o.horas,
+      dia: diaDaSemana(o.dataEntrega),
+      dataEntrega: o.dataEntrega
+    }))
+
+    setOrdens(ordensPcp)
+    await salvarPcp(ordensPcp)
+    setMensagem("Dados atualizados a partir do ERP")
+
+  } catch (erro) {
+    console.error("Falha ao sincronizar com ERP", erro)
+    setMensagem("Erro ao buscar dados do ERP")
+  }
+}
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
@@ -190,20 +186,37 @@ const [modoTv, setModoTv] = useState(false)
               Programação Semanal
             </h2>
 
-            <button
-              onClick={() => window.print()}
-              style={{
-                padding: "8px 14px",
-                borderRadius: 6,
-                border: "1px solid #444",
-                background: "#f0f0f0",
-                cursor: "pointer",
-                fontWeight: "bold"
-              }}
-            >
-              Imprimir / PDF
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={sincronizarComErp}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 6,
+                  border: "1px solid #444",
+                  background: "#e8f3ff",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                Atualizar do ERP
+              </button>
+
+              <button
+                onClick={() => window.print()}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 6,
+                  border: "1px solid #444",
+                  background: "#f0f0f0",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                Imprimir / PDF
+              </button>
+            </div>
           </div>
+
 
           <Board
             ordens={ordensFiltradas}
