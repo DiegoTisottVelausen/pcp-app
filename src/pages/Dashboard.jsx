@@ -1,9 +1,16 @@
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 import { useEffect, useState } from "react"
 import { carregarPcp, salvarPcp, carregarOrdensErp } from "../services/pcpService"
 import KpiRow from "../components/kpi/KpiRow"
 import Board from "../components/board/Board"
 import { pcpData } from "../data/pcpFakeData"
-import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, estaAtrasada, nivelDeAtraso } from "../utils/pcpCalculations"
+import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, estaAtrasada, nivelDeAtraso, diaDaSemana } from "../utils/pcpCalculations"
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 
 export default function Dashboard() {
     
@@ -39,9 +46,10 @@ const [modoTv, setModoTv] = useState(false)
             produto: o.produto,
             operacao: o.operacao,
             tempo: o.horas,
-            dia: "SEG",                // regra inicial simples
+            dia: diaDaSemana(o.dataEntrega),
             dataEntrega: o.dataEntrega
           }))
+
 
           // 3) joga no estado da tela
           setOrdens(ordensPcp)

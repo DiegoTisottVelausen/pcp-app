@@ -76,3 +76,11 @@ export function contarAtrasoCritico(ordens) {
     ordem => nivelDeAtraso(ordem) === "critico"
   ).length
 }
+
+export function diaDaSemana(dataIso) {
+  const data = new Date(dataIso)
+
+  const dias = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"]
+
+  return dias[data.getDay()]
+}
