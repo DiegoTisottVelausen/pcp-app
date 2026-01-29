@@ -75,7 +75,8 @@ async function sincronizarComErp() {
       operacao: o.operacao,
       tempo: o.horas,
       dia: diaDaSemana(o.dataEntrega),
-      dataEntrega: o.dataEntrega
+      dataEntrega: o.dataEntrega,
+      origem: "erp"
     }))
 
     setOrdens(ordensPcp)
