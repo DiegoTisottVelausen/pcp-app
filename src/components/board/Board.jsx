@@ -13,13 +13,13 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv }) {
 
   
   function handleDragEnd(event) {
+  
   const { active, over } = event
 
   if (!over) return
 
   const ordemId = active.id
   const novoDia = over.id
-
   const capacidadeMaxima = 8
 
   setOrdens(prev => {
@@ -56,16 +56,19 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv }) {
 
   return (
     <div style={{ marginBottom: 32 }}>
-      <h3>Programação Semanal</h3>
+      
+
 
       <DndContext onDragEnd={handleDragEnd}>
         <div
+          className="board-scroll"
           style={{
             overflowX: "auto",
             paddingBottom: 8
           }}
         >
           <div
+            className="board-row"
             style={{
               display: "flex",
               gap: 16,

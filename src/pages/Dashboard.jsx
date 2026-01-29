@@ -7,25 +7,25 @@ import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, est
 
 export default function Dashboard() {
     
-  const [ordens, setOrdens] = useState([])
-  const [mensagem, setMensagem] = useState("")
-  const capacidadePercentual = calcularCapacidadePercentual(ordens)
-  const atrasadas = contarAtrasadas(ordens)
-  const criticas = contarAtrasoCritico(ordens)
-  const [filtro, setFiltro] = useState("todos")
-  const ordensFiltradas = ordens.filter(ordem => 
-    {
-      if (filtro === "atrasados") {
-            return estaAtrasada(ordem)
-          }
+const [ordens, setOrdens] = useState([])
+const [mensagem, setMensagem] = useState("")
+const capacidadePercentual = calcularCapacidadePercentual(ordens)
+const atrasadas = contarAtrasadas(ordens)
+const criticas = contarAtrasoCritico(ordens)
+const [filtro, setFiltro] = useState("todos")
+const ordensFiltradas = ordens.filter(ordem => 
+  {
+    if (filtro === "atrasados") {
+          return estaAtrasada(ordem)
+        }
 
-      if (filtro === "criticos") {
-            return nivelDeAtraso(ordem) === "critico"
-          }
+    if (filtro === "criticos") {
+          return nivelDeAtraso(ordem) === "critico"
+        }
 
-          return true // todos
-    })
-  const [modoTv, setModoTv] = useState(false)
+        return true // todos
+  })
+const [modoTv, setModoTv] = useState(false)
 
 
     useEffect(() => {carregarPcp().then(dados => 
@@ -153,9 +153,25 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
-            Programação Semanal
-          </h2>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
+              Programação Semanal
+            </h2>
+
+            <button
+              onClick={() => window.print()}
+              style={{
+                padding: "8px 14px",
+                borderRadius: 6,
+                border: "1px solid #444",
+                background: "#f0f0f0",
+                cursor: "pointer",
+                fontWeight: "bold"
+              }}
+            >
+              Imprimir / PDF
+            </button>
+          </div>
 
           <Board
             ordens={ordensFiltradas}
