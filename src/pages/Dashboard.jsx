@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { carregarPcp, salvarPcp } from "../services/pcpService"
+import { carregarPcp, salvarPcp, carregarOrdensErp } from "../services/pcpService"
 import KpiRow from "../components/kpi/KpiRow"
 import Board from "../components/board/Board"
 import { pcpData } from "../data/pcpFakeData"
@@ -26,6 +26,17 @@ const ordensFiltradas = ordens.filter(ordem =>
         return true // todos
   })
 const [modoTv, setModoTv] = useState(false)
+
+    useEffect(() => {
+      carregarOrdensErp()
+        .then(dados => {
+          console.log("Dados vindos do ERP:", dados)
+        })
+        .catch(erro => {
+          console.error("Erro ao buscar ERP:", erro)
+        })
+    }, [])
+
 
 
     useEffect(() => {carregarPcp().then(dados => 
