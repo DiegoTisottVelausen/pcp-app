@@ -25,3 +25,9 @@ export async function carregarOrdensErp() {
   const dados = await res.json()
   return dados
 }
+
+export async function buscarOrdensDoErp() {
+  const resposta = await fetch("https://pcp-app-backend.onrender.com/erp/ordens")
+  const dados = await resposta.json()
+  return dados
+}

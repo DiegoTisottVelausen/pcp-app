@@ -2,15 +2,13 @@
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
 import { useEffect, useState } from "react"
-import { carregarPcp, salvarPcp, carregarOrdensErp } from "../services/pcpService"
+import { carregarPcp, salvarPcp, carregarOrdensErp, buscarOrdensDoErp } from "../services/pcpService"
 import KpiRow from "../components/kpi/KpiRow"
 import Board from "../components/board/Board"
-import { pcpData } from "../data/pcpFakeData"
 import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, estaAtrasada, nivelDeAtraso, diaDaSemana } from "../utils/pcpCalculations"
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
-
 
 export default function Dashboard() {
     
@@ -33,7 +31,10 @@ const ordensFiltradas = ordens.filter(ordem =>
         return true // todos
   })
 const [modoTv, setModoTv] = useState(false)
-    
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
     useEffect(() => {
       async function carregarDadosIniciais() {
         try {
@@ -58,17 +59,16 @@ const [modoTv, setModoTv] = useState(false)
           await salvarPcp(ordensPcp)
 
         } catch (erro) {
-          console.error("Falha ao carregar dados do ERP, usando dados fake", erro)
-
-          // fallback para dados fake se algo der errado
-          setOrdens(pcpData)
-          salvarPcp(pcpData)
+            console.error("Falha ao carregar dados do ERP", erro)
+            setMensagem("Erro ao carregar dados do ERP")
         }
       }
 
       carregarDadosIniciais()
     }, [])
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
     useEffect(() => 
         {
@@ -77,6 +77,8 @@ const [modoTv, setModoTv] = useState(false)
             }
         }, [ordens])
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
     useEffect(() => 
       {
@@ -90,6 +92,8 @@ const [modoTv, setModoTv] = useState(false)
       return () => clearInterval(intervalo)
       }, [modoTv])
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
   return (
     
