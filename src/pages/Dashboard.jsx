@@ -26,32 +26,41 @@ const ordensFiltradas = ordens.filter(ordem =>
         return true // todos
   })
 const [modoTv, setModoTv] = useState(false)
-
+    
     useEffect(() => {
-      carregarOrdensErp()
-        .then(dados => {
-          console.log("Dados vindos do ERP:", dados)
-        })
-        .catch(erro => {
-          console.error("Erro ao buscar ERP:", erro)
-        })
+      async function carregarDadosIniciais() {
+        try {
+          // 1) busca ordens do ERP
+          const ordensErp = await carregarOrdensErp()
+
+          // 2) converte para o formato do PCP
+          const ordensPcp = ordensErp.map(o => ({
+            id: o.id,
+            produto: o.produto,
+            operacao: o.operacao,
+            tempo: o.horas,
+            dia: "SEG",                // regra inicial simples
+            dataEntrega: o.dataEntrega
+          }))
+
+          // 3) joga no estado da tela
+          setOrdens(ordensPcp)
+
+          // 4) salva no backend do PCP também
+          await salvarPcp(ordensPcp)
+
+        } catch (erro) {
+          console.error("Falha ao carregar dados do ERP, usando dados fake", erro)
+
+          // fallback para dados fake se algo der errado
+          setOrdens(pcpData)
+          salvarPcp(pcpData)
+        }
+      }
+
+      carregarDadosIniciais()
     }, [])
 
-
-
-    useEffect(() => {carregarPcp().then(dados => 
-      {
-            if (dados.length === 0) 
-            {
-              setOrdens(pcpData)
-              salvarPcp(pcpData)
-            } 
-            else 
-            {
-              setOrdens(dados)
-            }
-      })
-    }, [])
 
     useEffect(() => 
         {
