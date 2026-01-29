@@ -69,22 +69,40 @@ async function sincronizarComErp() {
   try {
     const ordensErp = await carregarOrdensErp()
 
-    const ordensPcp = ordensErp.map(o => ({
-      id: o.id,
-      produto: o.produto,
-      operacao: o.operacao,
-      tempo: o.horas,
-      dia: diaDaSemana(o.dataEntrega),
-      dataEntrega: o.dataEntrega,
-      origem: "erp"
-    }))
+    setOrdens(prevOrdens => {
+      return ordensErp.map(oErp => {
+        const existente = prevOrdens.find(o => o.id === oErp.id)
 
-    setOrdens(ordensPcp)
-    await salvarPcp(ordensPcp)
-    setMensagem("Dados atualizados a partir do ERP")
+        const diaDoErp = diaDaSemana(oErp.dataEntrega)
+
+        const base = {
+          id: oErp.id,
+          produto: oErp.produto,
+          operacao: oErp.operacao,
+          tempo: oErp.horas,
+          dataEntrega: oErp.dataEntrega
+        }
+
+        if (existente && existente.origem === "manual") {
+          return {
+            ...base,
+            dia: existente.dia,
+            origem: "manual"
+          }
+        }
+
+        return {
+          ...base,
+          dia: diaDoErp,
+          origem: "erp"
+        }
+      })
+    })
+
+    setMensagem("Dados sincronizados com o ERP (mantendo ajustes manuais)")
   } catch (erro) {
     console.error("Erro ao sincronizar com ERP", erro)
-    setMensagem("Falha ao atualizar dados do ERP")
+    setMensagem("Erro ao sincronizar com o ERP")
   }
 }
 
@@ -197,13 +215,14 @@ async function sincronizarComErp() {
                   padding: "8px 14px",
                   borderRadius: 6,
                   border: "1px solid #444",
-                  background: "#e8f3ff",
+                  background: "#e8f0ff",
                   cursor: "pointer",
                   fontWeight: "bold"
                 }}
               >
                 Atualizar do ERP
               </button>
+
 
               <button
                 onClick={() => window.print()}

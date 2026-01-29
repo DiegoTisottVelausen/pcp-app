@@ -44,11 +44,8 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv }) {
 
     // ✅ MOVE
     setMensagem("")
-    return prev.map(ordem =>
-      ordem.id === ordemId
-        ? { ...ordem, dia: novoDia, origem: "manual" }
-        : ordem
-    )
+    return prev.map
+      (ordem => ordem.id === ordemId ? { ...ordem, dia: novoDia, origem: "manual" } : ordem )
   })
 }
 
