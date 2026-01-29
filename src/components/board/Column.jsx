@@ -22,7 +22,9 @@ return (
     <div
       ref={setNodeRef}
       style={{
-            flex: 1,
+            minWidth: modoTv ? 240 : 180,
+            maxWidth: modoTv ? 280 : 220,
+            flexShrink: 0,     // 👈 impede “esmagar”
             border: `2px solid ${excedeuCapacidade ? "#ff4d4d" : "#444"}`,
             borderRadius: 8,
             padding: 8,

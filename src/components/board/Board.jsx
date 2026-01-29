@@ -61,22 +61,29 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv }) {
       <DndContext onDragEnd={handleDragEnd}>
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${colunas}, 1fr)`,
-            gap: 16
+            overflowX: "auto",
+            paddingBottom: 8
           }}
         >
-
-          {dias.map(dia => (
-            <Column
-              key={dia}
-              dia={dia}
-              ordens={ordens.filter(o => o.dia === dia)}
-              modoTv={modoTv}
-            />
-          ))}
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              minWidth: 900 // 👈 força espaço mínimo total
+            }}
+          >
+            {dias.map(dia => (
+              <Column
+                key={dia}
+                dia={dia}
+                ordens={ordens.filter(o => o.dia === dia)}
+                modoTv={modoTv}
+              />
+            ))}
+          </div>
         </div>
       </DndContext>
+
     </div>
   )
 }
