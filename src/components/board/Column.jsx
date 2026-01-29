@@ -55,6 +55,7 @@ return (
                 operacao={ordem.operacao}
                 tempo={ordem.tempo}
                 dataEntrega={ordem.dataEntrega}
+                origem={ordem.origem}
                 modoTv={modoTv}
             />
 

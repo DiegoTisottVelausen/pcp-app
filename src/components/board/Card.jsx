@@ -8,6 +8,7 @@ export default function Card({
   operacao,
   tempo,
   dataEntrega,
+  origem,
   modoTv
 }) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -59,7 +60,16 @@ export default function Card({
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      <strong>{produto}</strong>
+            
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <strong>{produto}</strong>
+        {origem === "manual" && (
+          <span style={{ fontSize: 12, opacity: 0.8 }}>
+            🔧
+          </span>
+        )}
+      </div>
+
       <p style={{ margin: "4px 0", fontSize: 13 }}>{operacao}</p>
 
       <small>
