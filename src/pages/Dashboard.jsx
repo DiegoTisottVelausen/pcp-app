@@ -110,6 +110,21 @@ async function sincronizarComErp() {
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+function resetarTodosParaErp() {
+  setOrdens(prev =>
+    prev.map(o => ({
+      ...o,
+      dia: diaDaSemana(o.dataEntrega),
+      origem: "erp"
+    }))
+  )
+
+  setMensagem("Todos os ajustes manuais foram resetados para o padrão do ERP")
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
   return (
     
     <div 
@@ -223,6 +238,20 @@ async function sincronizarComErp() {
                 }}
               >
                 Atualizar do ERP
+              </button>
+
+              <button
+                onClick={resetarTodosParaErp}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 6,
+                  border: "1px solid #444",
+                  background: "#ffe9e9",
+                  cursor: "pointer",
+                  fontWeight: "bold"
+                }}
+              >
+                Resetar planejamento manual
               </button>
 
               <button
