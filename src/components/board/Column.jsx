@@ -57,7 +57,21 @@ return (
                 dataEntrega={ordem.dataEntrega}
                 origem={ordem.origem}
                 modoTv={modoTv}
+                onResetToErp={() => {
+                    setOrdens(prev =>
+                    prev.map(o =>
+                        o.id === ordem.id
+                        ? {
+                            ...o,
+                            dia: diaDaSemana(o.dataEntrega),
+                            origem: "erp"
+                            }
+                        : o
+                    )
+                    )
+                }}
             />
+
 
         ))}
       </div>

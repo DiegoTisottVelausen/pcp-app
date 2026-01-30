@@ -9,7 +9,8 @@ export default function Card({
   tempo,
   dataEntrega,
   origem,
-  modoTv
+  modoTv,
+  onResetToErp
 }) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
       id,
