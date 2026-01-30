@@ -312,7 +312,6 @@ function proximaSemana() {
               </button>
             </div>
 
-
             <div style={{ display: "flex", gap: 8 }}>
 
               <button
