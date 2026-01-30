@@ -44,8 +44,19 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, datasSem
 
     // ✅ MOVE
     setMensagem("")
-    return prev.map
-      (ordem => ordem.id === ordemId ? { ...ordem, dia: novoDia, origem: "manual" } : ordem )
+    return prev.map(ordem => {
+  if (ordem.id !== ordemId) return ordem
+
+  const novaDataEntrega = calcularDataDaColuna(novoDia) // baseada na semana atual
+
+  return {
+          ...ordem,
+          dia: novoDia,
+          dataEntrega: novaDataEntrega,
+          origem: "manual"
+        }
+      })
+  
   })
 }
 
