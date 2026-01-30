@@ -22,26 +22,10 @@ const ajustesManuais = ordens.filter(o => o.origem === "manual").length
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
-function inicioDaSemana(data) {
-  const d = new Date(data)
-  const dia = d.getDay() // 0 dom, 1 seg, ...
-  const diff = dia === 0 ? -6 : 1 - dia // ajusta para segunda
-  d.setDate(d.getDate() + diff)
-  d.setHours(0,0,0,0)
-  return d
-}
 
-function fimDaSemana(data) {
-  const inicio = inicioDaSemana(data)
-  const fim = new Date(inicio)
-  fim.setDate(inicio.getDate() + 4) // sexta
-  fim.setHours(23,59,59,999)
-  return fim
-}
 
 const [dataBaseSemana, setDataBaseSemana] = useState(new Date())
-const inicio = inicioDaSemana(dataBaseSemana)
-const fim = fimDaSemana(dataBaseSemana)
+
 
 
 function formatarDataCurta(data) {
@@ -51,7 +35,7 @@ function formatarDataCurta(data) {
   })
 }
 
-const labelSemana = `${formatarDataCurta(inicio)} – ${formatarDataCurta(fim)}`
+const labelSemana = `${formatarDataCurta(inicio)} - ${formatarDataCurta(fim)}`
 
 const ordensDaSemana = ordens.filter(o => {
   const data = new Date(o.dataEntrega)
@@ -186,6 +170,33 @@ function proximaSemana() {
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+function obterIntervaloSemana(dataBase) {
+  const inicio = new Date(dataBase)
+  const dia = inicio.getDay() // 0=Dom, 1=Seg, ..., 6=Sáb
+
+  // queremos segunda-feira como início
+  const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
+  inicio.setDate(inicio.getDate() + diffParaSegunda)
+
+  const fim = new Date(inicio)
+  fim.setDate(inicio.getDate() + 4) // sexta
+
+  return { inicio, fim }
+}
+
+function formatarData(d) {
+  return d.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit"
+  })
+}
+
+const { inicio, fim } = obterIntervaloSemana(dataBaseSemana)
+const textoSemana = `${formatarData(inicio)} - ${formatarData(fim)}`
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
   return (
     
     <div 
@@ -296,8 +307,9 @@ function proximaSemana() {
               </button>
 
               <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
-                Programação Semanal
+                Programação Semanal ({textoSemana})
               </h2>
+
 
               <button
                 onClick={proximaSemana}
