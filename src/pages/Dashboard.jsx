@@ -19,8 +19,39 @@ const horasTotaisSemana = ordens.reduce((soma, o) => soma + o.tempo, 0)
 const atrasadas = contarAtrasadas(ordens)
 const criticas = contarAtrasoCritico(ordens)
 const ajustesManuais = ordens.filter(o => o.origem === "manual").length
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+function inicioDaSemana(data) {
+  const d = new Date(data)
+  const dia = d.getDay() // 0 dom, 1 seg, ...
+  const diff = dia === 0 ? -6 : 1 - dia // ajusta para segunda
+  d.setDate(d.getDate() + diff)
+  d.setHours(0,0,0,0)
+  return d
+}
+
+function fimDaSemana(data) {
+  const inicio = inicioDaSemana(data)
+  const fim = new Date(inicio)
+  fim.setDate(inicio.getDate() + 4) // sexta
+  fim.setHours(23,59,59,999)
+  return fim
+}
+
+const hoje = new Date()
+const inicio = inicioDaSemana(hoje)
+const fim = fimDaSemana(hoje)
+
+const ordensDaSemana = ordens.filter(o => {
+  const data = new Date(o.dataEntrega)
+  return data >= inicio && data <= fim
+})
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
 const [filtro, setFiltro] = useState("todos")
-const ordensFiltradas = ordens.filter(ordem => 
+const ordensFiltradas = ordensDaSemana.filter(ordem => 
   {
     if (filtro === "atrasados") {
           return estaAtrasada(ordem)
