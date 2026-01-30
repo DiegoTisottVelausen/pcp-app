@@ -167,6 +167,25 @@ function resetarTodosParaErp() {
 //--------------------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
+function semanaAnterior() {
+  setDataBaseSemana(prev => {
+    const d = new Date(prev)
+    d.setDate(d.getDate() - 7)
+    return d
+  })
+}
+
+function proximaSemana() {
+  setDataBaseSemana(prev => {
+    const d = new Date(prev)
+    d.setDate(d.getDate() + 7)
+    return d
+  })
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
   return (
     
     <div 
@@ -263,9 +282,36 @@ function resetarTodosParaErp() {
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             
-            <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
-              Programação Semanal ({labelSemana})
-            </h2>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <button
+                onClick={semanaAnterior}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid #444",
+                  cursor: "pointer"
+                }}
+              >
+                {"<"}
+              </button>
+
+              <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
+                Programação Semanal
+              </h2>
+
+              <button
+                onClick={proximaSemana}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  border: "1px solid #444",
+                  cursor: "pointer"
+                }}
+              >
+                {">"}
+              </button>
+            </div>
+
 
             <div style={{ display: "flex", gap: 8 }}>
 
