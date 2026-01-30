@@ -1,6 +1,6 @@
 import KpiCard from "./KpiCard"
 
-export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais, modoTv }) {
+export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais, horasTotaisSemana, modoTv }) {
   return (
       <div
         style={{
