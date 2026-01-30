@@ -83,6 +83,23 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
   })
 }
 
+// calcula segunda-feira da semana atual
+const base = new Date(dataBaseSemana)
+const dia = base.getDay()
+const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
+
+const segunda = new Date(base)
+segunda.setDate(base.getDate() + diffParaSegunda)
+segunda.setHours(0, 0, 0, 0)
+
+// cria array com SEG..SEX
+const datasSemana = Array.from({ length: 5 }, (_, i) => {
+  const d = new Date(segunda)
+  d.setDate(segunda.getDate() + i)
+  return d
+})
+
+
   return (
     <div style={{ marginBottom: 32 }}>   
 
