@@ -60,7 +60,12 @@ export default function Card({
 
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div onDoubleClick={() => {
+                        if (origem === "manual" && onResetToErp) {
+                          onResetToErp()
+                        }
+                      }}
+ref={setNodeRef} style={style} {...listeners} {...attributes}>
             
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <strong>{produto}</strong>
