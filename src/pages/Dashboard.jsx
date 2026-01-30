@@ -396,7 +396,7 @@ const textoSemana = `${formatarData(inicio)} - ${formatarData(fim)}`
               setOrdens={setOrdens}
               setMensagem={setMensagem}
               modoTv={modoTv}
-              datasSemana={datasSemana}
+              dataBaseSemana={dataBaseSemana}
           />
 
     </div>

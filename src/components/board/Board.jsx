@@ -3,7 +3,7 @@ import Column from "./Column"
 
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
-export default function Board({ ordens, setOrdens, setMensagem, modoTv, datasSemana }) {
+export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBaseSemana }) {
   
   const largura = window.innerWidth
 
@@ -47,13 +47,13 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, datasSem
     return prev.map(ordem => {
       if (ordem.id !== ordemId) return ordem
 
-      // calcula segunda-feira da semana atual (hoje como base)
-      const hoje = new Date()
-      const diaSemana = hoje.getDay() // 0=dom, 1=seg...
-      const diffParaSegunda = (diaSemana === 0 ? -6 : 1 - diaSemana)
+      // segunda-feira da semana atualmente exibida
+      const base = new Date(dataBaseSemana)
+      const dia = base.getDay()
+      const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
 
-      const segunda = new Date(hoje)
-      segunda.setDate(hoje.getDate() + diffParaSegunda)
+      const segunda = new Date(base)
+      segunda.setDate(base.getDate() + diffParaSegunda)
       segunda.setHours(0, 0, 0, 0)
 
       // mapa de colunas
@@ -79,17 +79,12 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, datasSem
         origem: "manual"
       }
     })
-
   
   })
 }
 
-
-
   return (
-    <div style={{ marginBottom: 32 }}>
-      
-
+    <div style={{ marginBottom: 32 }}>   
 
       <DndContext onDragEnd={handleDragEnd}>
         <div
