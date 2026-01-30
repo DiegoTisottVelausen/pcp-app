@@ -26,7 +26,18 @@ const ajustesManuais = ordens.filter(o => o.origem === "manual").length
 
 const [dataBaseSemana, setDataBaseSemana] = useState(new Date())
 
+function obterIntervaloSemana(dataBase) {
+  const inicio = new Date(dataBase)
+  const dia = inicio.getDay()
+  const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
+  inicio.setDate(inicio.getDate() + diffParaSegunda)
 
+  const fim = new Date(inicio)
+  fim.setDate(inicio.getDate() + 4)
+  fim.setHours(23, 59, 59, 999)
+
+  return { inicio, fim }
+}
 
 function formatarDataCurta(data) {
   return data.toLocaleDateString("pt-BR", {
@@ -35,12 +46,15 @@ function formatarDataCurta(data) {
   })
 }
 
+const { inicio, fim } = obterIntervaloSemana(dataBaseSemana)
+
 const labelSemana = `${formatarDataCurta(inicio)} - ${formatarDataCurta(fim)}`
 
 const ordensDaSemana = ordens.filter(o => {
   const data = new Date(o.dataEntrega)
   return data >= inicio && data <= fim
 })
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -191,7 +205,6 @@ function formatarData(d) {
   })
 }
 
-const { inicio, fim } = obterIntervaloSemana(dataBaseSemana)
 const textoSemana = `${formatarData(inicio)} - ${formatarData(fim)}`
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
