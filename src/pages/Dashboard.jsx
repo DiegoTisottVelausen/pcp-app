@@ -39,9 +39,19 @@ function fimDaSemana(data) {
   return fim
 }
 
-const hoje = new Date()
-const inicio = inicioDaSemana(hoje)
-const fim = fimDaSemana(hoje)
+const [dataBaseSemana, setDataBaseSemana] = useState(new Date())
+const inicio = inicioDaSemana(dataBaseSemana)
+const fim = fimDaSemana(dataBaseSemana)
+
+
+function formatarDataCurta(data) {
+  return data.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit"
+  })
+}
+
+const labelSemana = `${formatarDataCurta(inicio)} – ${formatarDataCurta(fim)}`
 
 const ordensDaSemana = ordens.filter(o => {
   const data = new Date(o.dataEntrega)
@@ -254,7 +264,7 @@ function resetarTodosParaErp() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             
             <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
-              Programação Semanal
+              Programação Semanal ({labelSemana})
             </h2>
 
             <div style={{ display: "flex", gap: 8 }}>
