@@ -17,6 +17,7 @@ const [mensagem, setMensagem] = useState("")
 const capacidadePercentual = calcularCapacidadePercentual(ordens)
 const atrasadas = contarAtrasadas(ordens)
 const criticas = contarAtrasoCritico(ordens)
+const ajustesManuais = ordens.filter(o => o.origem === "manual").length
 const [filtro, setFiltro] = useState("todos")
 const ordensFiltradas = ordens.filter(ordem => 
   {
@@ -125,6 +126,7 @@ async function sincronizarComErp() {
             capacidade={capacidadePercentual}
             atrasadas={atrasadas}
             criticas={criticas}
+            ajustesManuais={ajustesManuais}
             modoTv={modoTv}
           />
 
@@ -223,7 +225,6 @@ async function sincronizarComErp() {
                 Atualizar do ERP
               </button>
 
-
               <button
                 onClick={() => window.print()}
                 style={{
@@ -241,7 +242,6 @@ async function sincronizarComErp() {
             </div>
 
           </div>
-
 
           <Board
             ordens={ordensFiltradas}

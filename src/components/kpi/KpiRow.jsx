@@ -1,6 +1,6 @@
 import KpiCard from "./KpiCard"
 
-export default function KpiRow({ capacidade, atrasadas, criticas, modoTv }) {
+export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais, modoTv }) {
   return (
       <div
         style={{
@@ -30,6 +30,13 @@ export default function KpiRow({ capacidade, atrasadas, criticas, modoTv }) {
         valor={`${capacidade.toFixed(0)}%`}
         modoTv={modoTv}
       />
+
+      <KpiCard
+        titulo="Ajustes manuais"
+        valor={ajustesManuais}
+        modoTv={modoTv}
+      />
+
     </div>
   )
 }
