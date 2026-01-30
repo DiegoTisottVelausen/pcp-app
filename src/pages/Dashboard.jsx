@@ -15,6 +15,7 @@ export default function Dashboard() {
 const [ordens, setOrdens] = useState([])
 const [mensagem, setMensagem] = useState("")
 const capacidadePercentual = calcularCapacidadePercentual(ordens)
+const horasTotaisSemana = ordens.reduce((soma, o) => soma + o.tempo, 0)
 const atrasadas = contarAtrasadas(ordens)
 const criticas = contarAtrasoCritico(ordens)
 const ajustesManuais = ordens.filter(o => o.origem === "manual").length
@@ -142,6 +143,7 @@ function resetarTodosParaErp() {
             atrasadas={atrasadas}
             criticas={criticas}
             ajustesManuais={ajustesManuais}
+            horasTotais={horasTotaisSemana}
             modoTv={modoTv}
           />
 

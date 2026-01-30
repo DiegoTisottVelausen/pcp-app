@@ -37,6 +37,12 @@ export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais
         modoTv={modoTv}
       />
 
+      <KpiCard
+        titulo="Horas planejadas"
+        valor={horasTotaisSemana.toFixed(1) + " h"}
+        modoTv={modoTv}
+      />
+
     </div>
   )
 }
