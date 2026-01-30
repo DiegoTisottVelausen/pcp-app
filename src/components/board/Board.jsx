@@ -11,6 +11,8 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
   if (largura <= 1200) colunas = 3
   if (largura <= 768) colunas = 2
 
+//----------------------------------------------------------//
+//----------------------------------------------------------//
   
   function handleDragEnd(event) {
   
@@ -26,8 +28,15 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
     const ordemMovida = prev.find(o => o.id === ordemId)
     if (!ordemMovida) return prev
 
+    const novaData = new Date(segunda)
+    novaData.setDate(segunda.getDate() + deslocamento)
+    const novaDataIso = novaData.toISOString().slice(0, 10)
+
     const horasNoDestino = prev
-      .filter(o => o.dia === novoDia && o.id !== ordemId)
+      .filter(o =>
+        o.id !== ordemId &&
+        o.dataEntrega === novaDataIso
+      )
       .reduce((soma, o) => soma + o.tempo, 0)
 
     const novaCarga = horasNoDestino + ordemMovida.tempo
@@ -83,6 +92,9 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
   })
 }
 
+//----------------------------------------------------------//
+//----------------------------------------------------------//
+
 // calcula segunda-feira da semana atual
 const base = new Date(dataBaseSemana)
 const dia = base.getDay()
@@ -99,6 +111,8 @@ const datasSemana = Array.from({ length: 5 }, (_, i) => {
   return d
 })
 
+//----------------------------------------------------------//
+//----------------------------------------------------------//
 
   return (
     <div style={{ marginBottom: 32 }}>   
