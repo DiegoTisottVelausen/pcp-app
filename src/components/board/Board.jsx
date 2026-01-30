@@ -45,17 +45,41 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, datasSem
     // ✅ MOVE
     setMensagem("")
     return prev.map(ordem => {
-  if (ordem.id !== ordemId) return ordem
+      if (ordem.id !== ordemId) return ordem
 
-  const novaDataEntrega = calcularDataDaColuna(novoDia) // baseada na semana atual
+      // calcula segunda-feira da semana atual (hoje como base)
+      const hoje = new Date()
+      const diaSemana = hoje.getDay() // 0=dom, 1=seg...
+      const diffParaSegunda = (diaSemana === 0 ? -6 : 1 - diaSemana)
 
-  return {
-          ...ordem,
-          dia: novoDia,
-          dataEntrega: novaDataEntrega,
-          origem: "manual"
-        }
-      })
+      const segunda = new Date(hoje)
+      segunda.setDate(hoje.getDate() + diffParaSegunda)
+      segunda.setHours(0, 0, 0, 0)
+
+      // mapa de colunas
+      const mapaDias = {
+        SEG: 0,
+        TER: 1,
+        QUA: 2,
+        QUI: 3,
+        SEX: 4
+      }
+
+      const deslocamento = mapaDias[novoDia] ?? 0
+
+      const novaData = new Date(segunda)
+      novaData.setDate(segunda.getDate() + deslocamento)
+
+      const novaDataIso = novaData.toISOString().slice(0, 10)
+
+      return {
+        ...ordem,
+        dia: novoDia,
+        dataEntrega: novaDataIso,
+        origem: "manual"
+      }
+    })
+
   
   })
 }
