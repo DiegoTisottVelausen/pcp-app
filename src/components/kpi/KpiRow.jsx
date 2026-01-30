@@ -1,6 +1,6 @@
 import KpiCard from "./KpiCard"
 
-export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais, horasTotaisSemana, modoTv }) {
+export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais, horasTotais, modoTv }) {
   return (
       <div
         style={{
@@ -39,7 +39,7 @@ export default function KpiRow({ capacidade, atrasadas, criticas, ajustesManuais
 
       <KpiCard
         titulo="Horas planejadas"
-        valor={horasTotaisSemana.toFixed(1) + " h"}
+        valor={`${(horasTotais ?? 0).toFixed(1)} h`}
         modoTv={modoTv}
       />
 
