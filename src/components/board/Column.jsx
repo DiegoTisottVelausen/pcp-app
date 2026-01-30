@@ -3,10 +3,19 @@ import Card from "./Card"
 import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
 
-export default function Column({ dia, ordens, modoTv }) {
+export default function Column({ dia, data, ordens, modoTv }) {
   const { setNodeRef } = useDroppable({
     id: dia
   })
+
+
+    function formatarDataColuna(d) {
+        return d.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit"
+        })
+    }
+
 
     const totalHoras = ordens.reduce(
         (soma, ordem) => soma + ordem.tempo,
@@ -33,7 +42,16 @@ return (
         }}
     >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <strong>{dia}</strong>
+
+
+
+            <div style={{ display: "flex", flexDirection: "column" }}>
+                <strong>{dia}</strong>
+                <span style={{ fontSize: 12, opacity: 0.8 }}>
+                    {formatarDataColuna(data)}
+                </span>
+            </div>
+
                 <span
                     style={{
                         fontSize: 12,
@@ -43,6 +61,7 @@ return (
                 >
                     {totalHoras.toFixed(1)} / {capacidadeMaxima} h
                 </span>
+        
         </div>
 
 

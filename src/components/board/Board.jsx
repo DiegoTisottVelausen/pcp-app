@@ -3,7 +3,7 @@ import Column from "./Column"
 
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
-export default function Board({ ordens, setOrdens, setMensagem, modoTv }) {
+export default function Board({ ordens, setOrdens, setMensagem, modoTv, datasSemana }) {
   
   const largura = window.innerWidth
 
@@ -72,14 +72,27 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv }) {
               minWidth: 900 // 👈 força espaço mínimo total
             }}
           >
-            {dias.map(dia => (
-              <Column
-                key={dia}
-                dia={dia}
-                ordens={ordens.filter(o => o.dia === dia)}
-                modoTv={modoTv}
-              />
-            ))}
+            {datasSemana.map((data, index) => {
+                const rotulos = ["SEG", "TER", "QUA", "QUI", "SEX"]
+
+                return (
+                  <Column
+                    key={index}
+                    dia={rotulos[index]}
+                    data={data}
+                    ordens={ordens.filter(o => {
+                      const d = new Date(o.dataEntrega)
+                      return (
+                        d.getFullYear() === data.getFullYear() &&
+                        d.getMonth() === data.getMonth() &&
+                        d.getDate() === data.getDate()
+                      )
+                    })}
+                    modoTv={modoTv}
+                  />
+                )
+              })}
+
           </div>
         </div>
       </DndContext>

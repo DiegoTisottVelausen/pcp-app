@@ -48,13 +48,19 @@ function formatarDataCurta(data) {
 
 const { inicio, fim } = obterIntervaloSemana(dataBaseSemana)
 
+const datasSemana = Array.from({ length: 5 }, (_, i) => {
+  const d = new Date(inicio)
+  d.setDate(inicio.getDate() + i)
+  return d
+})
+
+
 const labelSemana = `${formatarDataCurta(inicio)} - ${formatarDataCurta(fim)}`
 
 const ordensDaSemana = ordens.filter(o => {
   const data = new Date(o.dataEntrega)
   return data >= inicio && data <= fim
 })
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -386,10 +392,11 @@ const textoSemana = `${formatarData(inicio)} - ${formatarData(fim)}`
           </div>
 
           <Board
-            ordens={ordensFiltradas}
-            setOrdens={setOrdens}
-            setMensagem={setMensagem}
-            modoTv={modoTv}
+              ordens={ordensFiltradas}
+              setOrdens={setOrdens}
+              setMensagem={setMensagem}
+              modoTv={modoTv}
+              datasSemana={datasSemana}
           />
 
     </div>
