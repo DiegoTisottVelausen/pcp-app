@@ -1,9 +1,9 @@
-import { DndContext } from "@dnd-kit/core"
+import { DndContext, closestCenter, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
-export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBaseSemana }) {
+export default function Board({ dia, data, droppableId, ordens, modoTv, setOrdens }) {
   
   const largura = window.innerWidth
 
@@ -19,7 +19,10 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
   if (!over) return
 
   const ordemId = active.id
-  const novaDataIso = over.id // 👈 SEMPRE data yyyy-mm-dd
+  const novaDataIso = over.id
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(novaDataIso)) return
+
   const capacidadeMaxima = 8
 
   setOrdens(prev => {
@@ -33,24 +36,19 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
     const novaCarga = horasNoDestino + ordemMovida.tempo
 
     if (novaCarga > capacidadeMaxima) {
-      setMensagem(
-        `Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`
-      )
+      setMensagem(`Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`)
       return prev
     }
 
     setMensagem("")
     return prev.map(o =>
       o.id === ordemId
-        ? {
-            ...o,
-            dataEntrega: novaDataIso,
-            origem: "manual"
-          }
+        ? { ...o, dataEntrega: novaDataIso, origem: "manual" }
         : o
     )
   })
 }
+
 
 
 //----------------------------------------------------------//
@@ -78,7 +76,7 @@ const datasSemana = Array.from({ length: 5 }, (_, i) => {
   return (
     <div style={{ marginBottom: 32 }}>   
 
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext onDragEnd={handleDragEnd} collisionDetection={pointerWithin}>
         <div
           className="board-scroll"
           style={{
@@ -102,6 +100,7 @@ const datasSemana = Array.from({ length: 5 }, (_, i) => {
                     key={data.toISOString()}
                     dia={rotulos[index]}
                     data={data}
+                    setOrdens={setOrdens}
                     droppableId={data.toISOString().slice(0, 10)} // 👈 ESSENCIAL
                     ordens={ordens.filter(o => {
                       const d = new Date(o.dataEntrega)
