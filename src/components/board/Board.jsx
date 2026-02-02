@@ -21,7 +21,13 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
   if (!over) return
 
   const ordemId = active.id
-  const novoDia = over.id
+  let novoDia = over.id
+  // se soltou em cima de um CARD, pega a coluna dele
+  if (!["SEG", "TER", "QUA", "QUI", "SEX"].includes(novoDia)) {
+    const ordemSobreposta = ordens.find(o => o.id === novoDia)
+    if (!ordemSobreposta) return
+    novoDia = diaDaSemana(ordemSobreposta.dataEntrega)
+  }
   const capacidadeMaxima = 8
 
   setOrdens(prev => {
