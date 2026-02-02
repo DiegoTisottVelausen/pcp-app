@@ -68,7 +68,11 @@ return (
         </div>
 
 
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ flexGrow: 1,            // 👈 ESSENCIAL
+                    marginTop: 8,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8 }}>
         {ordensOrdenadas.map(ordem => (
             <Card
                 key={ordem.id}
