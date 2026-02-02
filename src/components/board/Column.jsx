@@ -37,7 +37,10 @@ return (
             border: `2px solid ${excedeuCapacidade ? "#ff4d4d" : "#444"}`,
             borderRadius: 8,
             padding: 8,
-            minHeight: 220,
+            minHeight: 300,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
             background: excedeuCapacidade ? "#2b1a1a" : "transparent"
         }}
     >
