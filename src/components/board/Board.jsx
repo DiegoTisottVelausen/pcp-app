@@ -1,6 +1,13 @@
 import { DndContext, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
+function formatarDataISO(d) {
+  const ano = d.getFullYear()
+  const mes = String(d.getMonth() + 1).padStart(2, "0")
+  const dia = String(d.getDate()).padStart(2, "0")
+  return `${ano}-${mes}-${dia}`
+}
+
 export default function Board({
   ordens,
   setOrdens,
@@ -9,30 +16,24 @@ export default function Board({
   dataBaseSemana
 }) {
 
-  function dateKey(d) {
-    if (typeof d === "string") return d
-    const y = d.getFullYear()
-    const m = String(d.getMonth() + 1).padStart(2, "0")
-    const day = String(d.getDate()).padStart(2, "0")
-    return `${y}-${m}-${day}`
-  }
-
-  function handleDragEnd({ active, over }) {
+  function handleDragEnd(event) {
+    const { active, over } = event
     if (!over) return
 
     const ordemId = active.id
     const novaDataIso = over.id
+    const capacidadeMaxima = 8
 
     setOrdens(prev => {
-      const ordem = prev.find(o => o.id === ordemId)
-      if (!ordem) return prev
+      const ordemMovida = prev.find(o => o.id === ordemId)
+      if (!ordemMovida) return prev
 
       const horasNoDestino = prev
         .filter(o => o.id !== ordemId && o.dataEntrega === novaDataIso)
         .reduce((s, o) => s + o.tempo, 0)
 
-      if (horasNoDestino + ordem.tempo > 8) {
-        setMensagem("Capacidade excedida (8h)")
+      if (horasNoDestino + ordemMovida.tempo > capacidadeMaxima) {
+        setMensagem("Capacidade excedida")
         return prev
       }
 
@@ -45,10 +46,11 @@ export default function Board({
     })
   }
 
-  // calcula segunda-feira local (SEM UTC)
+  // segunda-feira local (sem UTC)
   const base = new Date(dataBaseSemana)
-  const dia = base.getDay()
-  const diff = dia === 0 ? -6 : 1 - dia
+  const diaSemana = base.getDay()
+  const diff = diaSemana === 0 ? -6 : 1 - diaSemana
+
   const segunda = new Date(base)
   segunda.setDate(base.getDate() + diff)
   segunda.setHours(0, 0, 0, 0)
@@ -62,21 +64,16 @@ export default function Board({
   return (
     <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
-        {datasSemana.map((data, i) => {
-          const key = dateKey(data)
-          const rotulos = ["SEG", "TER", "QUA", "QUI", "SEX"]
-
-          return (
-            <Column
-              key={key}
-              dia={rotulos[i]}
-              data={data}
-              droppableId={key}
-              modoTv={modoTv}
-              ordens={ordens.filter(o => o.dataEntrega === key)}
-            />
-          )
-        })}
+        {datasSemana.map((data, index) => (
+          <Column
+            key={index}
+            dia={["SEG","TER","QUA","QUI","SEX"][index]}
+            data={data}
+            droppableId={formatarDataISO(data)}
+            ordens={ordens.filter(o => o.dataEntrega === formatarDataISO(data))}
+            modoTv={modoTv}
+          />
+        ))}
       </div>
     </DndContext>
   )

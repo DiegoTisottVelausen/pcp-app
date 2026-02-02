@@ -1,8 +1,8 @@
 import { useDraggable } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 
-export default function Card({ id, produto, operacao, tempo, origem, modoTv }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+export default function Card({ id, produto, operacao, tempo, modoTv }) {
+  const { setNodeRef, listeners, attributes, transform } = useDraggable({
     id,
     disabled: modoTv
   })
@@ -14,12 +14,11 @@ export default function Card({ id, produto, operacao, tempo, origem, modoTv }) {
       {...attributes}
       style={{
         transform: CSS.Translate.toString(transform),
-        border: "2px solid #444",
-        borderRadius: 6,
         padding: 8,
-        marginBottom: 8,
-        cursor: "grab",
-        background: origem === "manual" ? "#2a2a2a" : "#1f1f1f"
+        background: "#2a2a2a",
+        border: "1px solid #555",
+        borderRadius: 6,
+        cursor: "grab"
       }}
     >
       <strong>{produto}</strong>
@@ -28,4 +27,5 @@ export default function Card({ id, produto, operacao, tempo, origem, modoTv }) {
     </div>
   )
 }
+
 

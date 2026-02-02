@@ -4,17 +4,16 @@ import Card from "./Card"
 export default function Column({ dia, data, droppableId, ordens, modoTv }) {
   const { setNodeRef, isOver } = useDroppable({ id: droppableId })
 
-  const total = ordens.reduce((s, o) => s + o.tempo, 0)
+  const totalHoras = ordens.reduce((s, o) => s + o.tempo, 0)
 
   return (
     <div
       ref={setNodeRef}
       style={{
         minWidth: 200,
-        border: `2px solid ${total > 8 ? "#ff4d4d" : "#444"}`,
-        background: isOver ? "#1f2937" : "transparent",
         padding: 8,
-        borderRadius: 8
+        border: "2px solid #444",
+        background: isOver ? "#1e2a3a" : "transparent"
       }}
     >
       <strong>{dia}</strong>
@@ -22,11 +21,11 @@ export default function Column({ dia, data, droppableId, ordens, modoTv }) {
         {data.toLocaleDateString("pt-BR")}
       </div>
 
-      <div style={{ marginTop: 8 }}>
-        {ordens.map(o => (
-          <Card key={o.id} {...o} modoTv={modoTv} />
-        ))}
-      </div>
+      {ordens.map(o => (
+        <Card key={o.id} {...o} modoTv={modoTv} />
+      ))}
+
+      <small>{totalHoras.toFixed(1)} h</small>
     </div>
   )
 }
