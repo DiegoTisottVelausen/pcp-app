@@ -15,82 +15,43 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
 //----------------------------------------------------------//
   
   function handleDragEnd(event) {
-  
   const { active, over } = event
-
   if (!over) return
 
   const ordemId = active.id
-  let novoDia = over.id
-  // se soltou em cima de um CARD, pega a coluna dele
-  if (!["SEG", "TER", "QUA", "QUI", "SEX"].includes(novoDia)) {
-    const ordemSobreposta = ordens.find(o => o.id === novoDia)
-    if (!ordemSobreposta) return
-    novoDia = diaDaSemana(ordemSobreposta.dataEntrega)
-  }
+  const novaDataIso = over.id // 👈 SEMPRE data yyyy-mm-dd
   const capacidadeMaxima = 8
 
   setOrdens(prev => {
-  const ordemMovida = prev.find(o => o.id === ordemId)
-  if (!ordemMovida) return prev
+    const ordemMovida = prev.find(o => o.id === ordemId)
+    if (!ordemMovida) return prev
 
-  // 1) calcular segunda-feira da semana atual exibida
-  const base = new Date(dataBaseSemana)
-  const diaSemana = base.getDay()
-  const diffParaSegunda = (diaSemana === 0 ? -6 : 1 - diaSemana)
+    const horasNoDestino = prev
+      .filter(o => o.id !== ordemId && o.dataEntrega === novaDataIso)
+      .reduce((soma, o) => soma + o.tempo, 0)
 
-  const segunda = new Date(base)
-  segunda.setDate(base.getDate() + diffParaSegunda)
-  segunda.setHours(0, 0, 0, 0)
+    const novaCarga = horasNoDestino + ordemMovida.tempo
 
-  // 2) mapa de colunas -> deslocamento em dias
-  const mapaDias = {
-    SEG: 0,
-    TER: 1,
-    QUA: 2,
-    QUI: 3,
-    SEX: 4
-  }
-
-  const deslocamento = mapaDias[novoDia] ?? 0
-
-  // 3) data real de destino
-  const novaData = new Date(segunda)
-  novaData.setDate(segunda.getDate() + deslocamento)
-  const novaDataIso = novaData.toISOString().slice(0, 10)
-
-  // 4) soma das horas já existentes nessa data
-  const horasNoDestino = prev
-    .filter(o =>
-      o.id !== ordemId &&
-      o.dataEntrega === novaDataIso
-    )
-    .reduce((soma, o) => soma + o.tempo, 0)
-
-  const capacidadeMaxima = 8
-  const novaCarga = horasNoDestino + ordemMovida.tempo
-
-  // 🚫 bloqueio de capacidade
-  if (novaCarga > capacidadeMaxima) {
-    setMensagem(
-      `Não é possível mover: ${novoDia} ficaria com ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h).`
-    )
-    return prev
-  }
-
-  // ✅ move a ordem
-  setMensagem("")
-  return prev.map(ordem => {
-    if (ordem.id !== ordemId) return ordem
-
-    return {
-      ...ordem,      
-      dataEntrega: novaDataIso,
-      origem: "manual"
+    if (novaCarga > capacidadeMaxima) {
+      setMensagem(
+        `Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`
+      )
+      return prev
     }
+
+    setMensagem("")
+    return prev.map(o =>
+      o.id === ordemId
+        ? {
+            ...o,
+            dataEntrega: novaDataIso,
+            origem: "manual"
+          }
+        : o
+    )
   })
-})
-  }
+}
+
 
 //----------------------------------------------------------//
 //----------------------------------------------------------//
@@ -138,9 +99,10 @@ const datasSemana = Array.from({ length: 5 }, (_, i) => {
 
                 return (
                   <Column
-                    key={index}
+                    key={data.toISOString()}
                     dia={rotulos[index]}
                     data={data}
+                    droppableId={data.toISOString().slice(0, 10)} // 👈 ESSENCIAL
                     ordens={ordens.filter(o => {
                       const d = new Date(o.dataEntrega)
                       return (
@@ -151,6 +113,7 @@ const datasSemana = Array.from({ length: 5 }, (_, i) => {
                     })}
                     modoTv={modoTv}
                   />
+
                 )
               })}
 

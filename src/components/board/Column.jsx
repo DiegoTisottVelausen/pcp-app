@@ -3,9 +3,9 @@ import Card from "./Card"
 import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
 
-export default function Column({ dia, data, ordens, modoTv }) {
+export default function Column({ dia, data, droppableId, ordens, modoTv }) {
   const { setNodeRef } = useDroppable({
-    id: dia
+    id: droppableId
   })
 
 
