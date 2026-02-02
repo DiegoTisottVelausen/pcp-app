@@ -1,4 +1,5 @@
 import { useDraggable } from "@dnd-kit/core"
+import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { estaAtrasada, diasDeAtraso, nivelDeAtraso } from "../../utils/pcpCalculations"
 
@@ -12,7 +13,13 @@ export default function Card({
   modoTv,
   onResetToErp
 }) {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    const {
+            attributes,
+            listeners,
+            setNodeRef,
+            transform,
+            transition
+          } = useSortable({
       id,
       disabled: modoTv
     })
@@ -49,16 +56,15 @@ export default function Card({
 
     const style = {
       transform: CSS.Translate.toString(transform),
+      transition,
       padding: 12,
       fontSize: 14,
       background: cores[nivel].background,
       border: `2px solid ${cores[nivel].border}`,
       borderRadius: 8,
-      cursor: "grab"
+      cursor: modoTv ? "default" : "grab"
     }
-
-
-
+    
   return (
     <div onDoubleClick={() => {
                         if (origem === "manual" && onResetToErp) {

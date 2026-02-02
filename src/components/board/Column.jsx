@@ -1,4 +1,5 @@
 import { useDroppable } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import Card from "./Card"
 import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
@@ -73,33 +74,39 @@ return (
                     display: "flex",
                     flexDirection: "column",
                     gap: 8 }}>
-        {ordensOrdenadas.map(ordem => (
-            <Card
-                key={ordem.id}
-                id={ordem.id}
-                produto={ordem.produto}
-                operacao={ordem.operacao}
-                tempo={ordem.tempo}
-                dataEntrega={ordem.dataEntrega}
-                origem={ordem.origem}
-                modoTv={modoTv}
-                onResetToErp={() => {
-                    setOrdens(prev =>
-                    prev.map(o =>
-                        o.id === ordem.id
-                        ? {
-                            ...o,
-                            dia: diaDaSemana(o.dataEntrega),
-                            origem: "erp"
-                            }
-                        : o
-                    )
-                    )
-                }}
-            />
+        <SortableContext
+        items={ordensOrdenadas.map(o => o.id)}
+        strategy={verticalListSortingStrategy}
+        >
+            {ordensOrdenadas.map(ordem => (
+                <Card
+                    key={ordem.id}
+                    id={ordem.id}
+                    produto={ordem.produto}
+                    operacao={ordem.operacao}
+                    tempo={ordem.tempo}
+                    dataEntrega={ordem.dataEntrega}
+                    origem={ordem.origem}
+                    modoTv={modoTv}
+                    onResetToErp={() => {
+                        setOrdens(prev =>
+                        prev.map(o =>
+                            o.id === ordem.id
+                            ? {
+                                ...o,
+                                dia: diaDaSemana(o.dataEntrega),
+                                origem: "erp"
+                                }
+                            : o
+                        )
+                        )
+                    }}
+                />
 
 
-        ))}
+            ))}
+        </SortableContext>
+          
       </div>
     </div>
   )
