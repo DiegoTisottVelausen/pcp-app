@@ -1,13 +1,6 @@
 import { DndContext, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
-function formatarDataISO(d) {
-  const ano = d.getFullYear()
-  const mes = String(d.getMonth() + 1).padStart(2, "0")
-  const dia = String(d.getDate()).padStart(2, "0")
-  return `${ano}-${mes}-${dia}`
-}
-
 export default function Board({
   ordens,
   setOrdens,
@@ -16,24 +9,50 @@ export default function Board({
   dataBaseSemana
 }) {
 
+  // ===============================
+  // calcula segunda-feira da semana
+  // ===============================
+  const base = new Date(dataBaseSemana)
+  const diaSemana = base.getDay()
+  const diffParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana
+
+  const segunda = new Date(base)
+  segunda.setDate(base.getDate() + diffParaSegunda)
+  segunda.setHours(0, 0, 0, 0)
+
+  // SEG → SEX (datas ISO)
+  const datasSemana = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(segunda)
+    d.setDate(segunda.getDate() + i)
+    return d.toISOString().slice(0, 10) // 👈 CRÍTICO
+  })
+
+  // ===============================
+  // DRAG END
+  // ===============================
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
 
     const ordemId = active.id
-    const novaDataIso = over.id
-    const capacidadeMaxima = 8
+    const novaDataIso = over.id // yyyy-mm-dd
 
     setOrdens(prev => {
       const ordemMovida = prev.find(o => o.id === ordemId)
       if (!ordemMovida) return prev
 
+      const capacidadeMaxima = 8
+
       const horasNoDestino = prev
         .filter(o => o.id !== ordemId && o.dataEntrega === novaDataIso)
-        .reduce((s, o) => s + o.tempo, 0)
+        .reduce((soma, o) => soma + o.tempo, 0)
 
-      if (horasNoDestino + ordemMovida.tempo > capacidadeMaxima) {
-        setMensagem("Capacidade excedida")
+      const novaCarga = horasNoDestino + ordemMovida.tempo
+
+      if (novaCarga > capacidadeMaxima) {
+        setMensagem(
+          `Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`
+        )
         return prev
       }
 
@@ -46,38 +65,41 @@ export default function Board({
     })
   }
 
-  // segunda-feira local (sem UTC)
-  const base = new Date(dataBaseSemana)
-  const diaSemana = base.getDay()
-  const diff = diaSemana === 0 ? -6 : 1 - diaSemana
-
-  const segunda = new Date(base)
-  segunda.setDate(base.getDate() + diff)
-  segunda.setHours(0, 0, 0, 0)
-
-  const datasSemana = Array.from({ length: 5 }, (_, i) => {
-    const d = new Date(segunda)
-    d.setDate(segunda.getDate() + i)
-    return d
-  })
-
   return (
-    <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
-      <div style={{ display: "flex", gap: 16 }}>
-        {datasSemana.map((data, index) => (
-          <Column
-            key={index}
-            dia={["SEG","TER","QUA","QUI","SEX"][index]}
-            data={data}
-            droppableId={formatarDataISO(data)}
-            ordens={ordens.filter(o => o.dataEntrega === formatarDataISO(data))}
-            modoTv={modoTv}
-          />
-        ))}
-      </div>
-    </DndContext>
+    <div style={{ marginBottom: 32 }}>
+      <DndContext
+        collisionDetection={pointerWithin}
+        onDragEnd={handleDragEnd}
+      >
+        <div style={{ overflowX: "auto", paddingBottom: 8 }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              minWidth: 900
+            }}
+          >
+            {datasSemana.map((dataIso, index) => {
+              const rotulos = ["SEG", "TER", "QUA", "QUI", "SEX"]
+
+              return (
+                <Column
+                  key={dataIso}
+                  dia={rotulos[index]}
+                  dataIso={dataIso}
+                  droppableId={dataIso}
+                  ordens={ordens.filter(o => o.dataEntrega === dataIso)}
+                  modoTv={modoTv}
+                />
+              )
+            })}
+          </div>
+        </div>
+      </DndContext>
+    </div>
   )
 }
+
 
 
 
