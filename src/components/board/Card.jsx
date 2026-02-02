@@ -2,8 +2,10 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
 export default function Card({ ordem, modoTv }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: ordem.id, disabled: modoTv })
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  id,
+  disabled: modoTv
+})
 
   const style = {
     transform: CSS.Transform.toString(transform),
