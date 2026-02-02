@@ -78,8 +78,7 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
     if (ordem.id !== ordemId) return ordem
 
     return {
-      ...ordem,
-      dia: novoDia,
+      ...ordem,      
       dataEntrega: novaDataIso,
       origem: "manual"
     }
