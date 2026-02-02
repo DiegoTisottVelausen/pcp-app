@@ -1,4 +1,4 @@
-import { DndContext, closestCenter } from "@dnd-kit/core"
+import { DndContext, closestCorners } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import Column from "./Column"
 
@@ -41,7 +41,7 @@ export default function Board({
   })
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
         {datasSemana.map(data => {
           const dataIso = data.toISOString().slice(0, 10)
