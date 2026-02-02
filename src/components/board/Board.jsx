@@ -3,7 +3,13 @@ import Column from "./Column"
 
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
-export default function Board({ dia, data, droppableId, ordens, modoTv, setOrdens }) {
+export default function Board({   
+  ordens,
+  setOrdens,
+  setMensagem,
+  modoTv,
+  dataBaseSemana
+ }) {
   
   const largura = window.innerWidth
 
