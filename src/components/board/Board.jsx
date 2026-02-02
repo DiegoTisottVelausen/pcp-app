@@ -8,31 +8,31 @@ export default function Board({
   modoTv,
   dataBaseSemana
 }) {
-  function handleDragEnd(event) {
-    const { active, over } = event
+
+  function dateKey(d) {
+    if (typeof d === "string") return d
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    return `${y}-${m}-${day}`
+  }
+
+  function handleDragEnd({ active, over }) {
     if (!over) return
 
     const ordemId = active.id
-    const novaDataIso = over.id // yyyy-mm-dd
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(novaDataIso)) return
-
-    const capacidadeMaxima = 8
+    const novaDataIso = over.id
 
     setOrdens(prev => {
-      const ordemMovida = prev.find(o => o.id === ordemId)
-      if (!ordemMovida) return prev
+      const ordem = prev.find(o => o.id === ordemId)
+      if (!ordem) return prev
 
       const horasNoDestino = prev
         .filter(o => o.id !== ordemId && o.dataEntrega === novaDataIso)
         .reduce((s, o) => s + o.tempo, 0)
 
-      const novaCarga = horasNoDestino + ordemMovida.tempo
-
-      if (novaCarga > capacidadeMaxima) {
-        setMensagem(
-          `Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`
-        )
+      if (horasNoDestino + ordem.tempo > 8) {
+        setMensagem("Capacidade excedida (8h)")
         return prev
       }
 
@@ -45,11 +45,10 @@ export default function Board({
     })
   }
 
-  // 👉 calcula segunda-feira
+  // calcula segunda-feira local (SEM UTC)
   const base = new Date(dataBaseSemana)
-  const diaSemana = base.getDay()
-  const diff = diaSemana === 0 ? -6 : 1 - diaSemana
-
+  const dia = base.getDay()
+  const diff = dia === 0 ? -6 : 1 - dia
   const segunda = new Date(base)
   segunda.setDate(base.getDate() + diff)
   segunda.setHours(0, 0, 0, 0)
@@ -60,25 +59,21 @@ export default function Board({
     return d
   })
 
-  const rotulos = ["SEG", "TER", "QUA", "QUI", "SEX"]
-
   return (
-    <DndContext
-      collisionDetection={pointerWithin}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
-        {datasSemana.map((data, index) => {
-          const dataIso = data.toISOString().slice(0, 10)
+        {datasSemana.map((data, i) => {
+          const key = dateKey(data)
+          const rotulos = ["SEG", "TER", "QUA", "QUI", "SEX"]
 
           return (
             <Column
-              key={dataIso}
-              dia={rotulos[index]}
+              key={key}
+              dia={rotulos[i]}
               data={data}
-              droppableId={dataIso}
-              ordens={ordens.filter(o => o.dataEntrega === dataIso)}
+              droppableId={key}
               modoTv={modoTv}
+              ordens={ordens.filter(o => o.dataEntrega === key)}
             />
           )
         })}
@@ -86,6 +81,7 @@ export default function Board({
     </DndContext>
   )
 }
+
 
 
 
