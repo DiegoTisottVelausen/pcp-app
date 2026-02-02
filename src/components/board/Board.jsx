@@ -25,72 +25,67 @@ export default function Board({ ordens, setOrdens, setMensagem, modoTv, dataBase
   const capacidadeMaxima = 8
 
   setOrdens(prev => {
-    const ordemMovida = prev.find(o => o.id === ordemId)
-    if (!ordemMovida) return prev
+  const ordemMovida = prev.find(o => o.id === ordemId)
+  if (!ordemMovida) return prev
 
-    const novaData = new Date(segunda)
-    novaData.setDate(segunda.getDate() + deslocamento)
-    const novaDataIso = novaData.toISOString().slice(0, 10)
+  // 1) calcular segunda-feira da semana atual exibida
+  const base = new Date(dataBaseSemana)
+  const diaSemana = base.getDay()
+  const diffParaSegunda = (diaSemana === 0 ? -6 : 1 - diaSemana)
 
-    const horasNoDestino = prev
-      .filter(o =>
-        o.id !== ordemId &&
-        o.dataEntrega === novaDataIso
-      )
-      .reduce((soma, o) => soma + o.tempo, 0)
+  const segunda = new Date(base)
+  segunda.setDate(base.getDate() + diffParaSegunda)
+  segunda.setHours(0, 0, 0, 0)
 
-    const novaCarga = horasNoDestino + ordemMovida.tempo
+  // 2) mapa de colunas -> deslocamento em dias
+  const mapaDias = {
+    SEG: 0,
+    TER: 1,
+    QUA: 2,
+    QUI: 3,
+    SEX: 4
+  }
 
-    // 🚫 BLOQUEIO
-    if (novaCarga > capacidadeMaxima) {
-      setMensagem(
-        `Não é possível mover: ${novoDia} ficaria com ${novaCarga.toFixed(
-          1
-        )}h (limite ${capacidadeMaxima}h).`
-      )
-      return prev
+  const deslocamento = mapaDias[novoDia] ?? 0
+
+  // 3) data real de destino
+  const novaData = new Date(segunda)
+  novaData.setDate(segunda.getDate() + deslocamento)
+  const novaDataIso = novaData.toISOString().slice(0, 10)
+
+  // 4) soma das horas já existentes nessa data
+  const horasNoDestino = prev
+    .filter(o =>
+      o.id !== ordemId &&
+      o.dataEntrega === novaDataIso
+    )
+    .reduce((soma, o) => soma + o.tempo, 0)
+
+  const capacidadeMaxima = 8
+  const novaCarga = horasNoDestino + ordemMovida.tempo
+
+  // 🚫 bloqueio de capacidade
+  if (novaCarga > capacidadeMaxima) {
+    setMensagem(
+      `Não é possível mover: ${novoDia} ficaria com ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h).`
+    )
+    return prev
+  }
+
+  // ✅ move a ordem
+  setMensagem("")
+  return prev.map(ordem => {
+    if (ordem.id !== ordemId) return ordem
+
+    return {
+      ...ordem,
+      dia: novoDia,
+      dataEntrega: novaDataIso,
+      origem: "manual"
     }
-
-    // ✅ MOVE
-    setMensagem("")
-    return prev.map(ordem => {
-      if (ordem.id !== ordemId) return ordem
-
-      // segunda-feira da semana atualmente exibida
-      const base = new Date(dataBaseSemana)
-      const dia = base.getDay()
-      const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
-
-      const segunda = new Date(base)
-      segunda.setDate(base.getDate() + diffParaSegunda)
-      segunda.setHours(0, 0, 0, 0)
-
-      // mapa de colunas
-      const mapaDias = {
-        SEG: 0,
-        TER: 1,
-        QUA: 2,
-        QUI: 3,
-        SEX: 4
-      }
-
-      const deslocamento = mapaDias[novoDia] ?? 0
-
-      const novaData = new Date(segunda)
-      novaData.setDate(segunda.getDate() + deslocamento)
-
-      const novaDataIso = novaData.toISOString().slice(0, 10)
-
-      return {
-        ...ordem,
-        dia: novoDia,
-        dataEntrega: novaDataIso,
-        origem: "manual"
-      }
-    })
-  
   })
-}
+})
+  }
 
 //----------------------------------------------------------//
 //----------------------------------------------------------//
