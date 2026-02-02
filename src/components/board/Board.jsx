@@ -1,4 +1,4 @@
-import { DndContext, closestCenter } from "@dnd-kit/core"
+import { DndContext, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
 export default function Board({
@@ -8,27 +8,12 @@ export default function Board({
   modoTv,
   dataBaseSemana
 }) {
-  // calcula segunda-feira
-  const base = new Date(dataBaseSemana)
-  const diaSemana = base.getDay()
-  const diff = diaSemana === 0 ? -6 : 1 - diaSemana
-
-  const segunda = new Date(base)
-  segunda.setDate(base.getDate() + diff)
-  segunda.setHours(0, 0, 0, 0)
-
-  const datasSemana = Array.from({ length: 5 }, (_, i) => {
-    const d = new Date(segunda)
-    d.setDate(segunda.getDate() + i)
-    return d
-  })
-
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
 
     const ordemId = active.id
-    const novaDataIso = over.id // YYYY-MM-DD
+    const novaDataIso = over.id // yyyy-mm-dd
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(novaDataIso)) return
 
@@ -60,21 +45,39 @@ export default function Board({
     })
   }
 
+  // 👉 calcula segunda-feira
+  const base = new Date(dataBaseSemana)
+  const diaSemana = base.getDay()
+  const diff = diaSemana === 0 ? -6 : 1 - diaSemana
+
+  const segunda = new Date(base)
+  segunda.setDate(base.getDate() + diff)
+  segunda.setHours(0, 0, 0, 0)
+
+  const datasSemana = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(segunda)
+    d.setDate(segunda.getDate() + i)
+    return d
+  })
+
+  const rotulos = ["SEG", "TER", "QUA", "QUI", "SEX"]
+
   return (
     <DndContext
-      collisionDetection={closestCenter}
+      collisionDetection={pointerWithin}
       onDragEnd={handleDragEnd}
     >
-      <div style={{ display: "flex", gap: 16, minWidth: 900 }}>
-        {datasSemana.map(data => {
-          const iso = data.toISOString().slice(0, 10)
+      <div style={{ display: "flex", gap: 16 }}>
+        {datasSemana.map((data, index) => {
+          const dataIso = data.toISOString().slice(0, 10)
 
           return (
             <Column
-              key={iso}
-              droppableId={iso}
+              key={dataIso}
+              dia={rotulos[index]}
               data={data}
-              ordens={ordens.filter(o => o.dataEntrega === iso)}
+              droppableId={dataIso}
+              ordens={ordens.filter(o => o.dataEntrega === dataIso)}
               modoTv={modoTv}
             />
           )
@@ -83,6 +86,7 @@ export default function Board({
     </DndContext>
   )
 }
+
 
 
 

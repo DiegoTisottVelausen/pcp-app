@@ -1,8 +1,9 @@
 import { useDroppable } from "@dnd-kit/core"
 import Card from "./Card"
+import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
-export default function Column({ data, droppableId, ordens, modoTv }) {
-  const { setNodeRef } = useDroppable({
+export default function Column({ dia, data, droppableId, ordens, modoTv }) {
+  const { setNodeRef, isOver } = useDroppable({
     id: droppableId
   })
 
@@ -12,7 +13,6 @@ export default function Column({ data, droppableId, ordens, modoTv }) {
 
   function formatarData(d) {
     return d.toLocaleDateString("pt-BR", {
-      weekday: "short",
       day: "2-digit",
       month: "2-digit"
     })
@@ -22,30 +22,41 @@ export default function Column({ data, droppableId, ordens, modoTv }) {
     <div
       ref={setNodeRef}
       style={{
-        minWidth: modoTv ? 240 : 180,
-        border: `2px solid ${excedeu ? "#ff4d4d" : "#444"}`,
-        borderRadius: 8,
+        minWidth: 220,
         padding: 8,
-        minHeight: 300,
-        display: "flex",
-        flexDirection: "column"
+        borderRadius: 8,
+        border: `2px solid ${isOver ? "#4da6ff" : excedeu ? "#ff4d4d" : "#444"}`,
+        background: isOver ? "#1c2733" : "transparent"
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <strong>{formatarData(data)}</strong>
-        <span style={{ fontSize: 12 }}>
+        <div>
+          <strong>{dia}</strong>
+          <div style={{ fontSize: 12 }}>{formatarData(data)}</div>
+        </div>
+        <div style={{ fontSize: 12 }}>
           {totalHoras.toFixed(1)} / {capacidadeMaxima}h
-        </span>
+        </div>
       </div>
 
       <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
-        {ordens.map(ordem => (
-          <Card key={ordem.id} {...ordem} modoTv={modoTv} />
+        {ordenarPorPrioridade(ordens).map(ordem => (
+          <Card
+            key={ordem.id}
+            id={ordem.id}
+            produto={ordem.produto}
+            operacao={ordem.operacao}
+            tempo={ordem.tempo}
+            dataEntrega={ordem.dataEntrega}
+            origem={ordem.origem}
+            modoTv={modoTv}
+          />
         ))}
       </div>
     </div>
   )
 }
+
 
 
 
