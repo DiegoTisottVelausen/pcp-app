@@ -1,4 +1,4 @@
-import { DndContext, pointerWithin } from "@dnd-kit/core"
+import { DndContext, closestCenter } from "@dnd-kit/core"
 import Column from "./Column"
 
 const dias = ["SEG", "TER", "QUA", "QUI", "SEX"]
@@ -84,7 +84,7 @@ const datasSemana = Array.from({ length: 5 }, (_, i) => {
     <div style={{ marginBottom: 32 }}>   
 
       <DndContext 
-        collisionDetection={pointerWithin}
+        collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
         <div
