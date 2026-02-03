@@ -1,6 +1,13 @@
 import { DndContext, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
+function formatarDataLocal(date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
+}
+
 export default function Board({
   ordens,
   setOrdens,
@@ -9,19 +16,13 @@ export default function Board({
   dataBaseSemana
 }) {
 
-  function formatarIsoLocal(date) {
-    const y = date.getFullYear()
-    const m = String(date.getMonth() + 1).padStart(2, "0")
-    const d = String(date.getDate()).padStart(2, "0")
-    return `${y}-${m}-${d}`
-  }
-
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
 
     const ordemId = active.id
     const novaDataIso = over.id
+    const capacidadeMaxima = 8
 
     setOrdens(prev => {
       const ordemMovida = prev.find(o => o.id === ordemId)
@@ -32,8 +33,9 @@ export default function Board({
         .reduce((s, o) => s + o.tempo, 0)
 
       const novaCarga = horasNoDestino + ordemMovida.tempo
-      if (novaCarga > 8) {
-        setMensagem(`Não é possível mover: ${novaCarga.toFixed(1)}h (limite 8h)`)
+
+      if (novaCarga > capacidadeMaxima) {
+        setMensagem(`Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`)
         return prev
       }
 
@@ -46,38 +48,38 @@ export default function Board({
     })
   }
 
-  // 👉 calcular segunda-feira LOCAL
+  // segunda-feira local correta
   const base = new Date(dataBaseSemana)
-  base.setHours(0, 0, 0, 0)
-
   const diaSemana = base.getDay()
   const diffParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana
 
   const segunda = new Date(base)
   segunda.setDate(base.getDate() + diffParaSegunda)
+  segunda.setHours(0, 0, 0, 0)
 
   const datasSemana = Array.from({ length: 5 }, (_, i) => {
     const d = new Date(segunda)
     d.setDate(segunda.getDate() + i)
-    d.setHours(0, 0, 0, 0)
     return d
   })
 
   return (
-    <DndContext
-      collisionDetection={pointerWithin}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
-        {datasSemana.map(data => (
-          <Column
-            key={formatarIsoLocal(data)}
-            dia={data}
-            droppableId={formatarIsoLocal(data)}
-            ordens={ordens.filter(o => o.dataEntrega === formatarIsoLocal(data))}
-            modoTv={modoTv}
-          />
-        ))}
+        {datasSemana.map(data => {
+          const dataIso = formatarDataLocal(data)
+
+          return (
+            <Column
+              key={dataIso}
+              dia={["SEG", "TER", "QUA", "QUI", "SEX"][data.getDay() - 1]}
+              data={data}
+              droppableId={dataIso}
+              ordens={ordens.filter(o => o.dataEntrega === dataIso)}
+              modoTv={modoTv}
+            />
+          )
+        })}
       </div>
     </DndContext>
   )

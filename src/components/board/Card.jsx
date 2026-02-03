@@ -18,15 +18,16 @@ export default function Card({ id, produto, operacao, tempo, modoTv }) {
         borderRadius: 6,
         background: "#2a2a2a",
         border: "2px solid #444",
-        cursor: modoTv ? "default" : "grab"
+        cursor: "grab"
       }}
     >
       <strong>{produto}</strong>
-      <div style={{ fontSize: 13 }}>{operacao}</div>
-      <small>{tempo} h</small>
+      <div>{operacao}</div>
+      <small>{tempo}h</small>
     </div>
   )
 }
+
 
 
 
