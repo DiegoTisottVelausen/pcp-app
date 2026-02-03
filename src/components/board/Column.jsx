@@ -1,37 +1,34 @@
 import { useDroppable } from "@dnd-kit/core"
 import Card from "./Card"
-import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
-export default function Column({ dia, data, droppableId, ordens, modoTv }) {
-  const { setNodeRef, isOver } = useDroppable({ id: droppableId })
-
-  const totalHoras = ordens.reduce((s, o) => s + o.tempo, 0)
-  const excedeu = totalHoras > 8
+export default function Column({ data, droppableId, ordens, modoTv }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: droppableId
+  })
 
   return (
     <div
       ref={setNodeRef}
       style={{
-        minWidth: 200,
-        border: `2px solid ${isOver ? "#4da6ff" : excedeu ? "#ff4d4d" : "#444"}`,
+        width: 220,
+        minHeight: 300,
+        border: "2px solid #444",
         borderRadius: 8,
         padding: 8,
-        background: isOver ? "#1f2a38" : "transparent"
+        background: isOver ? "#222" : "transparent"
       }}
     >
-      <strong>{dia}</strong>
-      <div style={{ fontSize: 12 }}>
-        {data.toLocaleDateString("pt-BR")}
-      </div>
+      <strong>{data.toLocaleDateString("pt-BR")}</strong>
 
       <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
-        {ordenarPorPrioridade(ordens).map(o => (
-          <Card key={o.id} {...o} modoTv={modoTv} />
+        {ordens.map(ordem => (
+          <Card key={ordem.id} {...ordem} modoTv={modoTv} />
         ))}
       </div>
     </div>
   )
 }
+
 
 
 
