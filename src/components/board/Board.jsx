@@ -26,6 +26,7 @@ export default function Board({
 
     setOrdens(prev => {
       const ordemMovida = prev.find(o => o.id === ordemId)
+      console.log("ANTES:", ordemMovida.dataEntrega)
       if (!ordemMovida) return prev
 
       const horasNoDestino = prev
@@ -48,7 +49,6 @@ export default function Board({
     })
 
     console.log("DROP EM:", over.id)
-    console.log("ANTES:", ordemMovida.dataEntrega)
     console.log("DEPOIS:", novaDataIso)
 
   }
@@ -58,15 +58,23 @@ export default function Board({
   const diaSemana = base.getDay()
   const diffParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana
 
-  const segunda = new Date(base)
-  segunda.setDate(base.getDate() + diffParaSegunda)
-  segunda.setHours(0, 0, 0, 0)
+  function getSegundaFeira(date) {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  d.setHours(0, 0, 0, 0)
+  return d
+  }
+
+  const segunda = getSegundaFeira(dataBaseSemana)
 
   const datasSemana = Array.from({ length: 5 }, (_, i) => {
     const d = new Date(segunda)
     d.setDate(segunda.getDate() + i)
     return d
   })
+
 
   return (
     <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
