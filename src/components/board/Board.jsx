@@ -46,6 +46,11 @@ export default function Board({
           : o
       )
     })
+
+    console.log("DROP EM:", over.id)
+    console.log("ANTES:", ordemMovida.dataEntrega)
+    console.log("DEPOIS:", novaDataIso)
+
   }
 
   // segunda-feira local correta
