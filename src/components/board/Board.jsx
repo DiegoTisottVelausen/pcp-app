@@ -1,19 +1,12 @@
 import { DndContext, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
-function formatarDataLocal(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
-}
-
 export default function Board({
   ordens,
   setOrdens,
   setMensagem,
   modoTv,
-  dataBaseSemana
+  datasSemana
 }) {
 
   function handleDragEnd(event) {
@@ -22,11 +15,9 @@ export default function Board({
 
     const ordemId = active.id
     const novaDataIso = over.id
-    const capacidadeMaxima = 8
 
     setOrdens(prev => {
       const ordemMovida = prev.find(o => o.id === ordemId)
-      console.log("ANTES:", ordemMovida.dataEntrega)
       if (!ordemMovida) return prev
 
       const horasNoDestino = prev
@@ -34,9 +25,10 @@ export default function Board({
         .reduce((s, o) => s + o.tempo, 0)
 
       const novaCarga = horasNoDestino + ordemMovida.tempo
+      const capacidadeMaxima = 8
 
       if (novaCarga > capacidadeMaxima) {
-        setMensagem(`Não é possível mover: ${novaCarga.toFixed(1)}h (limite ${capacidadeMaxima}h)`)
+        setMensagem(`Capacidade excedida (${novaCarga}h)`)
         return prev
       }
 
@@ -47,48 +39,20 @@ export default function Board({
           : o
       )
     })
-
-    console.log("DROP EM:", over.id)
-    console.log("DEPOIS:", novaDataIso)
-
   }
-
-  // segunda-feira local correta
-  const base = new Date(dataBaseSemana)
-  const diaSemana = base.getDay()
-  const diffParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana
-
-  function getSegundaFeira(date) {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  d.setHours(0, 0, 0, 0)
-  return d
-  }
-
-  const segunda = getSegundaFeira(dataBaseSemana)
-
-  const datasSemana = Array.from({ length: 5 }, (_, i) => {
-    const d = new Date(segunda)
-    d.setDate(segunda.getDate() + i)
-    return d
-  })
-
 
   return (
     <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
         {datasSemana.map(data => {
-          const dataIso = formatarDataLocal(data)
-
+          const iso = data.toISOString().slice(0, 10)
           return (
             <Column
-              key={dataIso}
-              dia={["SEG", "TER", "QUA", "QUI", "SEX"][data.getDay() - 1]}
+              key={iso}
+              dia={["SEG","TER","QUA","QUI","SEX"][data.getDay()-1]}
               data={data}
-              droppableId={dataIso}
-              ordens={ordens.filter(o => o.dataEntrega === dataIso)}
+              droppableId={iso}
+              ordens={ordens.filter(o => o.dataEntrega === iso)}
               modoTv={modoTv}
             />
           )

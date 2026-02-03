@@ -6,7 +6,7 @@ export default function Card({ id, produto, operacao, tempo, modoTv }) {
     id,
     disabled: modoTv
   })
-
+  
   return (
     <div
       ref={setNodeRef}
