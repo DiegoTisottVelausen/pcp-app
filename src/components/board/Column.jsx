@@ -11,6 +11,13 @@ export default function Column({ dateKey, ordens }) {
   )
 
   console.log("📦 Render coluna:", dateKey, ordensDoDia.length)
+  console.log(
+  "📦 Render coluna:",
+  dia,
+  data.toISOString().slice(0, 10),
+  ordens.length
+)
+
 
   return (
     <div

@@ -5,6 +5,7 @@ export default function Card({ ordem }) {
     useDraggable({ id: ordem.id })
 
   console.log("🃏 Render card:", ordem.id, ordem.dataEntrega)
+  console.log("🃏 Render card:", id)
 
   return (
     <div

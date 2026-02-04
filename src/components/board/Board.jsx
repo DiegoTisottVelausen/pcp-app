@@ -26,6 +26,8 @@ export default function Board({ ordens, setOrdens, dataBaseSemana }) {
   const dias = getWeek(dataBaseSemana)
 
   console.log("🟢 Board render | semana:", dias)
+  console.log("🟢 Board render | dataBaseSemana:", dataBaseSemana)
+
 
   function handleDragEnd(event) {
     const { active, over } = event
@@ -33,7 +35,8 @@ export default function Board({ ordens, setOrdens, dataBaseSemana }) {
 
     console.log("🟡 DRAG END")
     console.log("➡️ Card:", active.id)
-    console.log("⬇️ Drop em:", over.id)
+    console.log("⬇️ Drop em:", over?.id)
+
 
     setOrdens(prev =>
       prev.map(o =>
@@ -41,7 +44,29 @@ export default function Board({ ordens, setOrdens, dataBaseSemana }) {
           ? { ...o, dataEntrega: over.id }
           : o
       )
+
     )
+      console.log("🔍 Ordem encontrada:", ordemMovida)
+      console.log("⏱️ Nova carga:", novaCarga)
+
+      console.log(
+        "📅 Segunda calculada:",
+        segunda,
+        segunda.toISOString().slice(0, 10)
+      )
+
+      datasSemana.forEach(d =>
+          console.log("📆 Coluna criada:", d.toISOString().slice(0, 10))
+        )
+
+        const isoColuna = data.toISOString().slice(0, 10)
+
+      console.log(
+        `📦 Ordens ${isoColuna}:`,
+        ordens.filter(o => o.dataEntrega === isoColuna).length
+        )
+
+
   }
 
   return (
