@@ -147,6 +147,7 @@ async function sincronizarComErp() {
     })
 
     setMensagem("Dados sincronizados com o ERP (mantendo ajustes manuais)")
+    console.log(diaDaSemana)
   } catch (erro) {
     console.error("Erro ao sincronizar com ERP", erro)
     setMensagem("Erro ao sincronizar com o ERP")
