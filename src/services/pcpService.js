@@ -1,33 +1,20 @@
-const API_URL = "https://pcp-app-backend.onrender.com/pcp"
+const API = "http://localhost:3001"
 
 export async function carregarPcp() {
-  const res = await fetch(API_URL)
+  const res = await fetch(`${API}/pcp`)
   return res.json()
 }
 
 export async function salvarPcp(ordens) {
-  await fetch(API_URL, {
+  await fetch(`${API}/pcp`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(ordens)
   })
 }
 
 export async function carregarOrdensErp() {
-  const res = await fetch("https://pcp-app-backend.onrender.com/erp/ordens")
-
-  if (!res.ok) {
-    throw new Error("Erro ao buscar ordens do ERP")
-  }
-
-  const dados = await res.json()
-  return dados
+  const res = await fetch(`${API}/erp/ordens`)
+  return res.json()
 }
 
-export async function buscarOrdensDoErp() {
-  const resposta = await fetch("https://pcp-app-backend.onrender.com/erp/ordens")
-  const dados = await resposta.json()
-  return dados
-}

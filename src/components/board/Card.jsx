@@ -1,11 +1,8 @@
 import { useDraggable } from "@dnd-kit/core"
+import { CSS } from "@dnd-kit/utilities"
 
-export default function Card({ ordem }) {
-  const { attributes, listeners, setNodeRef, transform } =
-    useDraggable({ id: ordem.id })
-
-  console.log("🃏 Render card:", ordem.id, ordem.dataEntrega)
-  console.log("🃏 Render card:", id)
+export default function Card({ id, produto, operacao, tempo }) {
+  const { setNodeRef, attributes, listeners, transform } = useDraggable({ id })
 
   return (
     <div
@@ -13,22 +10,22 @@ export default function Card({ ordem }) {
       {...listeners}
       {...attributes}
       style={{
+        transform: CSS.Translate.toString(transform),
         padding: 8,
-        marginTop: 8,
-        background: "#333",
-        color: "#fff",
+        background: "#2a2a2a",
+        border: "2px solid #555",
         borderRadius: 6,
-        cursor: "grab",
-        transform: transform
-          ? `translate(${transform.x}px, ${transform.y}px)`
-          : undefined
+        cursor: "grab"
       }}
     >
-      <div>{ordem.produto}</div>
-      <small>{ordem.operacao}</small>
+      <strong>{produto}</strong>
+      <div>{operacao}</div>
+      <small>{tempo}h</small>
     </div>
   )
 }
+
+
 
 
 

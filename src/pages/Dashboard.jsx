@@ -1,404 +1,72 @@
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
 import { useEffect, useState } from "react"
-import { carregarPcp, salvarPcp, carregarOrdensErp, buscarOrdensDoErp } from "../services/pcpService"
-import KpiRow from "../components/kpi/KpiRow"
-import Board from "../components/board/Board"
-import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, estaAtrasada, nivelDeAtraso, diaDaSemana } from "../utils/pcpCalculations"
+import {
+  carregarOrdensErp,
+  carregarPcp,
+  salvarPcp
+} from "../services/pcpService"
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
+import {
+  calcularCapacidadePercentual,
+  contarAtrasadas,
+  contarAtrasoCritico
+} from "../utils/pcpCalculations"
+
+import Board from "../components/board/Board"
+import KpiRow from "../components/kpi/KpiRow"
 
 export default function Dashboard() {
-    
-const [ordens, setOrdens] = useState([])
-const [mensagem, setMensagem] = useState("")
-const capacidadePercentual = calcularCapacidadePercentual(ordens)
-const horasTotaisSemana = ordens.reduce((soma, o) => soma + o.tempo, 0)
-const atrasadas = contarAtrasadas(ordens)
-const criticas = contarAtrasoCritico(ordens)
-const ajustesManuais = ordens.filter(o => o.origem === "manual").length
+  const [ordens, setOrdens] = useState([])
+  const [mensagem, setMensagem] = useState("")
+  const [dataBaseSemana, setDataBaseSemana] = useState("2026-02-02")
 
-//--------------------------------------------------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    async function init() {
+      const erp = await carregarOrdensErp()
+      const pcp = await carregarPcp()
 
+      if (pcp.length > 0) {
+        setOrdens(pcp)
+      } else {
+        setOrdens(
+          erp.map(o => ({
+            id: o.id,
+            produto: o.produto,
+            operacao: o.operacao,
+            tempo: o.horas,
+            dataEntrega: o.dataEntrega,
+            origem: "erp"
+          }))
+        )
+      }
+    }
+    init()
+  }, [])
 
-
-const [dataBaseSemana, setDataBaseSemana] = useState(new Date())
-
-function obterIntervaloSemana(dataBase) {
-  const inicio = new Date(dataBase)
-  const dia = inicio.getDay()
-  const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
-  inicio.setDate(inicio.getDate() + diffParaSegunda)
-
-  const fim = new Date(inicio)
-  fim.setDate(inicio.getDate() + 4)
-  fim.setHours(23, 59, 59, 999)
-
-  return { inicio, fim }
-}
-
-function formatarDataCurta(data) {
-  return data.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit"
-  })
-}
-
-const { inicio, fim } = obterIntervaloSemana(dataBaseSemana)
-
-const datasSemana = Array.from({ length: 5 }, (_, i) => {
-  const d = new Date(inicio)
-  d.setDate(inicio.getDate() + i)
-  return d
-})
-
-
-const labelSemana = `${formatarDataCurta(inicio)} - ${formatarDataCurta(fim)}`
-
-const ordensDaSemana = ordens.filter(o => {
-  const data = new Date(o.dataEntrega)
-  return data >= inicio && data <= fim
-})
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-const [filtro, setFiltro] = useState("todos")
-const ordensFiltradas = ordensDaSemana.filter(ordem => 
-  {
-    if (filtro === "atrasados") {
-          return estaAtrasada(ordem)
-        }
-
-    if (filtro === "criticos") {
-          return nivelDeAtraso(ordem) === "critico"
-        }
-
-        return true // todos
-  })
-const [modoTv, setModoTv] = useState(false)
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-    useEffect(() => {sincronizarComErp()}, [])
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-    useEffect(() => 
-        {
-            if (ordens.length > 0) {
-                salvarPcp(ordens)
-            }
-        }, [ordens])
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-    useEffect(() => 
-      {
-        if (!modoTv) return
-
-      const intervalo = setInterval(() => 
-        {
-          carregarPcp().then(setOrdens)
-        }, 30000) // 30s
-
-      return () => clearInterval(intervalo)
-      }, [modoTv])
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-async function sincronizarComErp() {
-  try {
-    const ordensErp = await carregarOrdensErp()
-
-    setOrdens(prevOrdens => {
-      return ordensErp.map(oErp => {
-        const existente = prevOrdens.find(o => o.id === oErp.id)
-
-        const diaDoErp = diaDaSemana(oErp.dataEntrega)
-
-        const base = {
-          id: oErp.id,
-          produto: oErp.produto,
-          operacao: oErp.operacao,
-          tempo: oErp.horas,
-          dataEntrega: oErp.dataEntrega
-        }
-
-        if (existente && existente.origem === "manual") {
-          return {
-            ...base,
-            dia: existente.dia,
-            origem: "manual"
-          }
-        }
-
-        return {
-          ...base,
-          dia: diaDoErp,
-          origem: "erp"
-        }
-      })
-    })
-
-    setMensagem("Dados sincronizados com o ERP (mantendo ajustes manuais)")    
-  } catch (erro) {
-    console.error("Erro ao sincronizar com ERP", erro)
-    setMensagem("Erro ao sincronizar com o ERP")
-  }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-function resetarTodosParaErp() {
-  setOrdens(prev =>
-    prev.map(o => ({
-      ...o,
-      dia: diaDaSemana(o.dataEntrega),
-      origem: "erp"
-    }))
-  )
-
-  setMensagem("Todos os ajustes manuais foram resetados para o padrão do ERP")
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-function semanaAnterior() {
-  setDataBaseSemana(prev => {
-    const d = new Date(prev)
-    d.setDate(d.getDate() - 7)
-    return d
-  })
-}
-
-function proximaSemana() {
-  setDataBaseSemana(prev => {
-    const d = new Date(prev)
-    d.setDate(d.getDate() + 7)
-    return d
-  })
-}
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-function obterIntervaloSemana(dataBase) {
-  const inicio = new Date(dataBase)
-  const dia = inicio.getDay() // 0=Dom, 1=Seg, ..., 6=Sáb
-
-  // queremos segunda-feira como início
-  const diffParaSegunda = (dia === 0 ? -6 : 1 - dia)
-  inicio.setDate(inicio.getDate() + diffParaSegunda)
-
-  const fim = new Date(inicio)
-  fim.setDate(inicio.getDate() + 4) // sexta
-
-  return { inicio, fim }
-}
-
-function formatarData(d) {
-  return d.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit"
-  })
-}
-
-const textoSemana = `${formatarData(inicio)} - ${formatarData(fim)}`
-
-//--------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------------------
+  useEffect(() => {
+    if (ordens.length) salvarPcp(ordens)
+  }, [ordens])
 
   return (
-    
-    <div 
-      style=
-        {{
-          padding: modoTv ? "32px 48px" : "24px 32px",
-          fontSize: modoTv ? 18 : 14
-        }}
-    >
+    <div style={{ padding: 24 }}>
+      <h1>PCP</h1>
 
-          <h1 style={{ fontSize: modoTv ? 36 : 28 }}>PCP</h1>
+      <KpiRow
+        capacidade={calcularCapacidadePercentual(ordens)}
+        atrasadas={contarAtrasadas(ordens)}
+        criticas={contarAtrasoCritico(ordens)}
+        ajustesManuais={ordens.filter(o => o.origem === "manual").length}
+        horasTotais={ordens.reduce((s, o) => s + o.tempo, 0)}
+      />
 
-          <KpiRow
-            capacidade={capacidadePercentual}
-            atrasadas={atrasadas}
-            criticas={criticas}
-            ajustesManuais={ajustesManuais}
-            horasTotais={horasTotaisSemana}
-            modoTv={modoTv}
-          />
+      {mensagem && <p>{mensagem}</p>}
 
-          {mensagem && (
-            <div
-              style={{
-                background: "#2b1a1a",
-                color: "#ffb3b3",
-                padding: 8,
-                borderRadius: 6,
-                marginBottom: 12
-              }}
-            >
-              {mensagem}
-            </div>
-          )}
-
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-            <strong>{modoTv ? "Modo TV / Chão de Fábrica" : "Modo Normal"}</strong>
-
-            <button
-              onClick={() => setModoTv(prev => !prev)}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 6,
-                border: "1px solid #444",
-                cursor: "pointer"
-              }}
-            >
-              {modoTv ? "Sair do Modo TV" : "Ativar Modo TV"}
-            </button>
-          </div>
-
-          <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-
-            <button
-              onClick={() => setFiltro("todos")}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 6,
-                border: filtro === "todos" ? "2px solid #000" : "1px solid #ccc",
-                background: filtro === "todos" ? "#eee" : "#fff",
-                cursor: "pointer"
-              }}
-            >
-              Todos
-            </button>
-
-            <button
-              onClick={() => setFiltro("atrasados")}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 6,
-                border: filtro === "atrasados" ? "2px solid #ff4d4d" : "1px solid #ccc",
-                background: filtro === "atrasados" ? "#ffecec" : "#fff",
-                cursor: "pointer"
-              }}
-            >
-              Atrasados
-            </button>
-
-            <button
-              onClick={() => setFiltro("criticos")}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 6,
-                border: filtro === "criticos" ? "2px solid #d10000" : "1px solid #ccc",
-                background: filtro === "criticos" ? "#ffd6d6" : "#fff",
-                cursor: "pointer"
-              }}
-            >
-              Críticos
-            </button>
-
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <button
-                onClick={semanaAnterior}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: 6,
-                  border: "1px solid #444",
-                  cursor: "pointer"
-                }}
-              >
-                {"<"}
-              </button>
-
-              <h2 style={{ fontSize: modoTv ? 26 : 20, margin: "24px 0 12px" }}>
-                Programação Semanal ({textoSemana})
-              </h2>
-
-
-              <button
-                onClick={proximaSemana}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: 6,
-                  border: "1px solid #444",
-                  cursor: "pointer"
-                }}
-              >
-                {">"}
-              </button>
-            </div>
-
-            <div style={{ display: "flex", gap: 8 }}>
-
-              <button
-                onClick={sincronizarComErp}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: 6,
-                  border: "1px solid #444",
-                  background: "#e8f0ff",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
-              >
-                Atualizar do ERP
-              </button>
-
-              <button
-                onClick={resetarTodosParaErp}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: 6,
-                  border: "1px solid #444",
-                  background: "#ffe9e9",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
-              >
-                Resetar planejamento manual
-              </button>
-
-              <button
-                onClick={() => window.print()}
-                style={{
-                  padding: "8px 14px",
-                  borderRadius: 6,
-                  border: "1px solid #444",
-                  background: "#f0f0f0",
-                  cursor: "pointer",
-                  fontWeight: "bold"
-                }}
-              >
-                Imprimir / PDF
-              </button>
-
-            </div>
-
-          </div>
-
-          <Board
-              ordens={ordensFiltradas}
-              setOrdens={setOrdens}
-              setMensagem={setMensagem}
-              modoTv={modoTv}
-              dataBaseSemana={dataBaseSemana}
-          />
-
+      <Board
+        ordens={ordens}
+        setOrdens={setOrdens}
+        setMensagem={setMensagem}
+        dataBaseSemana={dataBaseSemana}
+      />
     </div>
   )
 }
+

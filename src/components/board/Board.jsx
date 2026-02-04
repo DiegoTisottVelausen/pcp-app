@@ -1,97 +1,52 @@
-import { DndContext } from "@dnd-kit/core"
+import { DndContext, pointerWithin } from "@dnd-kit/core"
 import Column from "./Column"
 
-function formatDate(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
-}
-
-function getWeek(baseDate) {
-  const base = new Date(baseDate)
-  base.setHours(12, 0, 0, 0)
-
-  const day = base.getDay() || 7
-  base.setDate(base.getDate() - (day - 1))
+function gerarSemana(dataBase) {
+  const base = new Date(`${dataBase}T12:00:00`)
+  const dia = base.getDay()
+  const diff = dia === 0 ? -6 : 1 - dia
+  base.setDate(base.getDate() + diff)
 
   return Array.from({ length: 5 }, (_, i) => {
     const d = new Date(base)
     d.setDate(base.getDate() + i)
-    return formatDate(d)
+    return d.toISOString().slice(0, 10)
   })
 }
 
-export default function Board({ ordens, setOrdens, dataBaseSemana }) {
-  const dias = getWeek(dataBaseSemana)
-
-  console.log("🟢 Board render | semana:", dias)
-  console.log("🟢 Board render | dataBaseSemana:", dataBaseSemana)
-
+export default function Board({ ordens, setOrdens, setMensagem, dataBaseSemana }) {
+  const semana = gerarSemana(dataBaseSemana)
 
   function handleDragEnd(event) {
     const { active, over } = event
     if (!over) return
 
-    console.log("🟡 DRAG END")
-    console.log("➡️ Card:", active.id)
-    console.log("⬇️ Drop em:", over?.id)
-
+    const novaData = over.id
 
     setOrdens(prev =>
       prev.map(o =>
         o.id === active.id
-          ? { ...o, dataEntrega: over.id }
+          ? { ...o, dataEntrega: novaData, origem: "manual" }
           : o
       )
-
     )
-      console.log("🔍 Ordem encontrada:", ordemMovida)
-      console.log("⏱️ Nova carga:", novaCarga)
-
-      console.log(
-        "📅 Segunda calculada:",
-        segunda,
-        segunda.toISOString().slice(0, 10)
-      )
-
-      datasSemana.forEach(d =>
-          console.log("📆 Coluna criada:", d.toISOString().slice(0, 10))
-        )
-
-        const isoColuna = data.toISOString().slice(0, 10)
-
-      console.log(
-        `📦 Ordens ${isoColuna}:`,
-        ordens.filter(o => o.dataEntrega === isoColuna).length
-        )
-
-
   }
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext
+      collisionDetection={pointerWithin}
+      onDragEnd={handleDragEnd}
+    >
       <div style={{ display: "flex", gap: 16 }}>
-        {dias.map(dateKey => (
+        {semana.map(data => (
           <Column
-            key={dateKey}
-            dateKey={dateKey}
-            ordens={ordens}
+            key={data}
+            data={data}
+            droppableId={data}
+            ordens={ordens.filter(o => o.dataEntrega === data)}
           />
         ))}
       </div>
     </DndContext>
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-

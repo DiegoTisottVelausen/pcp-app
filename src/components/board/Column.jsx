@@ -1,23 +1,13 @@
 import { useDroppable } from "@dnd-kit/core"
 import Card from "./Card"
+import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
 
-export default function Column({ dateKey, ordens }) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: dateKey
-  })
+export default function Column({ dia, data, droppableId, ordens, modoTv }) {
+  const { setNodeRef, isOver } = useDroppable({ id: droppableId })
 
-  const ordensDoDia = ordens.filter(
-    o => o.dataEntrega === dateKey
-  )
+  console.log("📦 Render coluna:", data, ordens.length)
 
-  console.log("📦 Render coluna:", dateKey, ordensDoDia.length)
-  console.log(
-  "📦 Render coluna:",
-  dia,
-  data.toISOString().slice(0, 10),
-  ordens.length
-)
-
+  const ordenadas = ordenarPorPrioridade(ordens)
 
   return (
     <div
@@ -25,21 +15,24 @@ export default function Column({ dateKey, ordens }) {
       style={{
         width: 220,
         minHeight: 300,
-        border: "1px solid #ccc",
         padding: 8,
-        background: isOver ? "#f0f8ff" : "#fff"
+        borderRadius: 8,
+        border: "2px solid #444",
+        background: isOver ? "#1f2933" : "#111",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8
       }}
     >
-      <strong>{dateKey}</strong>
+      <strong>{dia}</strong>
+      <small>{data}</small>
 
-      {ordensDoDia.map(o => (
-        <Card key={o.id} ordem={o} />
+      {ordenadas.map(ordem => (
+        <Card key={ordem.id} {...ordem} modoTv={modoTv} />
       ))}
     </div>
   )
 }
-
-
 
 
 
