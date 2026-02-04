@@ -1,13 +1,16 @@
 import { useDroppable } from "@dnd-kit/core"
 import Card from "./Card"
 
-export default function Column({ dia, data, droppableId, ordens, modoTv }) {
-
+export default function Column({ dateKey, ordens }) {
   const { setNodeRef, isOver } = useDroppable({
-    id: droppableId
+    id: dateKey
   })
 
-  console.log("📦 Render coluna:", dia, droppableId, ordens.length)
+  const ordensDoDia = ordens.filter(
+    o => o.dataEntrega === dateKey
+  )
+
+  console.log("📦 Render coluna:", dateKey, ordensDoDia.length)
 
   return (
     <div
@@ -15,32 +18,20 @@ export default function Column({ dia, data, droppableId, ordens, modoTv }) {
       style={{
         width: 220,
         minHeight: 300,
+        border: "1px solid #ccc",
         padding: 8,
-        borderRadius: 8,
-        border: "2px solid #444",
-        background: isOver ? "#1f2937" : "transparent",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8
+        background: isOver ? "#f0f8ff" : "#fff"
       }}
     >
-      <strong>{dia}</strong>
-      <small>{droppableId}</small>
+      <strong>{dateKey}</strong>
 
-      {ordens.map(o => (
-        <Card
-          key={o.id}
-          id={o.id}
-          produto={o.produto}
-          operacao={o.operacao}
-          tempo={o.tempo}
-          origem={o.origem}
-          modoTv={modoTv}
-        />
+      {ordensDoDia.map(o => (
+        <Card key={o.id} ordem={o} />
       ))}
     </div>
   )
 }
+
 
 
 
