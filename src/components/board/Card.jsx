@@ -6,33 +6,47 @@ export default function Card({
   produto,
   operacao,
   tempo,
+  origem,
   modoTv
 }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging
+  } = useDraggable({
     id,
     disabled: modoTv
   })
 
+  console.log("🃏 Render card:", id)
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    padding: 12,
+    borderRadius: 8,
+    background: "#2a2a2a",
+    border: "2px solid #555",
+    cursor: "grab",
+    opacity: isDragging ? 0.5 : 1
+  }
+
   return (
     <div
       ref={setNodeRef}
+      style={style}
       {...listeners}
       {...attributes}
-      style={{
-        transform: CSS.Translate.toString(transform),
-        padding: 10,
-        border: "2px solid #666",
-        borderRadius: 6,
-        background: "#2a2a2a",
-        cursor: "grab"
-      }}
     >
       <strong>{produto}</strong>
       <div>{operacao}</div>
-      <small>{tempo}h</small>
+      <small>{tempo}h {origem === "manual" && "🔧"}</small>
     </div>
   )
 }
+
 
 
 

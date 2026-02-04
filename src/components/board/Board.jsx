@@ -9,59 +9,64 @@ export default function Board({
   dataBaseSemana
 }) {
 
-  // 🔹 calcula segunda-feira da semana atual
+  console.log("🟢 Board render | dataBaseSemana:", dataBaseSemana)
+
+  function toDateKey(date) {
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, "0")
+    const d = String(date.getDate()).padStart(2, "0")
+    return `${y}-${m}-${d}`
+  }
+
+  // 🧮 calcula segunda-feira corretamente (LOCAL)
   const base = new Date(dataBaseSemana)
-  const diaSemana = base.getDay() // 0 dom, 1 seg...
+  base.setHours(12, 0, 0, 0) // 🔥 evita bug de fuso
+
+  const diaSemana = base.getDay() // 0 = domingo
   const diffParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana
 
   const segunda = new Date(base)
   segunda.setDate(base.getDate() + diffParaSegunda)
-  segunda.setHours(0, 0, 0, 0)
 
-  // 🔹 cria SEG → SEX como datas reais
+  console.log("📅 Segunda calculada:", segunda, toDateKey(segunda))
+
   const datasSemana = Array.from({ length: 5 }, (_, i) => {
     const d = new Date(segunda)
     d.setDate(segunda.getDate() + i)
     return d
   })
 
+  datasSemana.forEach(d =>
+    console.log("📆 Coluna criada:", toDateKey(d))
+  )
+
   function handleDragEnd(event) {
     const { active, over } = event
-
-    console.log("🟡 DRAG END")
-    console.log("active.id:", active?.id)
-    console.log("over.id:", over?.id)
-
     if (!over) return
 
-    const ordemId = active.id
-    const novaDataIso = over.id // 🔥 SEMPRE yyyy-mm-dd
+    console.log("🟡 DRAG END")
+    console.log("➡️ Card:", active.id)
+    console.log("⬇️ Drop em:", over.id)
 
-    // segurança
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(novaDataIso)) {
-      console.warn("⛔ over.id não é data válida:", novaDataIso)
-      return
-    }
+    const ordemId = active.id
+    const novaData = over.id
 
     setOrdens(prev => {
       const ordemMovida = prev.find(o => o.id === ordemId)
 
-      if (!ordemMovida) {
-        console.error("❌ ordem não encontrada:", ordemId)
-        return prev
-      }
+      console.log("🔍 Ordem encontrada:", ordemMovida)
 
-      console.log("ANTES:", ordemMovida.dataEntrega)
-      console.log("DEPOIS:", novaDataIso)
+      if (!ordemMovida) return prev
 
       const horasNoDestino = prev
-        .filter(o => o.id !== ordemId && o.dataEntrega === novaDataIso)
+        .filter(o => o.id !== ordemId && o.dataEntrega === novaData)
         .reduce((s, o) => s + o.tempo, 0)
 
       const novaCarga = horasNoDestino + ordemMovida.tempo
+      console.log("⏱️ Nova carga:", novaCarga)
 
       if (novaCarga > 8) {
-        setMensagem(`Não é possível mover: ${novaCarga.toFixed(1)}h (limite 8h)`)
+        setMensagem(`Capacidade excedida (${novaCarga}h)`)
         return prev
       }
 
@@ -69,7 +74,7 @@ export default function Board({
 
       return prev.map(o =>
         o.id === ordemId
-          ? { ...o, dataEntrega: novaDataIso, origem: "manual" }
+          ? { ...o, dataEntrega: novaData, origem: "manual" }
           : o
       )
     })
@@ -81,17 +86,22 @@ export default function Board({
       onDragEnd={handleDragEnd}
     >
       <div style={{ display: "flex", gap: 16 }}>
-        {datasSemana.map(data => {
-          const iso = data.toISOString().slice(0, 10)
+        {datasSemana.map((data, index) => {
+          const dateKey = toDateKey(data)
 
-          console.log("📅 COLUNA:", iso)
+          const ordensDoDia = ordens.filter(
+            o => o.dataEntrega === dateKey
+          )
+
+          console.log(`📦 Ordens ${dateKey}:`, ordensDoDia.length)
 
           return (
             <Column
-              key={iso}
-              droppableId={iso}
+              key={dateKey}
+              dia={["SEG", "TER", "QUA", "QUI", "SEX"][index]}
               data={data}
-              ordens={ordens.filter(o => o.dataEntrega === iso)}
+              droppableId={dateKey}
+              ordens={ordensDoDia}
               modoTv={modoTv}
             />
           )
@@ -100,6 +110,7 @@ export default function Board({
     </DndContext>
   )
 }
+
 
 
 

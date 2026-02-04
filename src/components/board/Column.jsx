@@ -1,10 +1,13 @@
 import { useDroppable } from "@dnd-kit/core"
 import Card from "./Card"
 
-export default function Column({ data, droppableId, ordens, modoTv }) {
+export default function Column({ dia, data, droppableId, ordens, modoTv }) {
+
   const { setNodeRef, isOver } = useDroppable({
     id: droppableId
   })
+
+  console.log("📦 Render coluna:", dia, droppableId, ordens.length)
 
   return (
     <div
@@ -12,22 +15,33 @@ export default function Column({ data, droppableId, ordens, modoTv }) {
       style={{
         width: 220,
         minHeight: 300,
-        border: "2px solid #444",
-        borderRadius: 8,
         padding: 8,
-        background: isOver ? "#222" : "transparent"
+        borderRadius: 8,
+        border: "2px solid #444",
+        background: isOver ? "#1f2937" : "transparent",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8
       }}
     >
-      <strong>{data.toLocaleDateString("pt-BR")}</strong>
+      <strong>{dia}</strong>
+      <small>{droppableId}</small>
 
-      <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
-        {ordens.map(ordem => (
-          <Card key={ordem.id} {...ordem} modoTv={modoTv} />
-        ))}
-      </div>
+      {ordens.map(o => (
+        <Card
+          key={o.id}
+          id={o.id}
+          produto={o.produto}
+          operacao={o.operacao}
+          tempo={o.tempo}
+          origem={o.origem}
+          modoTv={modoTv}
+        />
+      ))}
     </div>
   )
 }
+
 
 
 
