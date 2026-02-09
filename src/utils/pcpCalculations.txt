@@ -1,0 +1,281 @@
+ARQUIVO: pcpCalculations.js
+DESCRIÇÃO: Módulo de regras de negócio e cálculos do PCP
+AUTOR: Projeto PCP
+TIPO: Lógica de Domínio (Domain Logic)
+DEPENDÊNCIAS: Nenhuma externa
+USO: Frontend e/ou Backend
+
+==================================================
+OBJETIVO DO ARQUIVO
+==================================================
+
+O arquivo pcpCalculations.js centraliza todas as regras de negócio
+relacionadas ao Planejamento e Controle da Produção (PCP).
+
+Ele é responsável por:
+- Tratamento e normalização de datas
+- Identificação e quantificação de atrasos
+- Classificação de nível de atraso
+- Ordenação de ordens por prioridade
+- Cálculo de capacidade produtiva
+- Análise de gargalos por dia e por máquina
+
+Este arquivo NÃO possui:
+- Lógica de interface (UI)
+- Chamadas HTTP
+- Dependência de ERP, banco de dados ou framework
+
+Por isso, pode ser reutilizado tanto no frontend quanto no backend.
+
+==================================================
+CONCEITO FUNDAMENTAL DE TEMPO (PCP)
+==================================================
+
+Todo o sistema trabalha com o conceito de "DIA FECHADO".
+
+Isso significa que:
+- Horas não são consideradas para atraso
+- Uma ordem com data de entrega igual ao dia atual NÃO é atraso
+- Atraso ocorre somente quando dataEntrega < hoje
+
+Essa abordagem evita:
+- Bugs de fuso horário
+- Inconsistências ao longo do dia
+- KPIs instáveis
+
+==================================================
+FUNÇÕES DO MÓDULO
+==================================================
+
+--------------------------------------------------
+Função: dataSemHora
+--------------------------------------------------
+Tipo: Função utilitária interna
+
+Descrição:
+Normaliza uma data ISO removendo completamente a informação
+de hora, minuto, segundo e milissegundo.
+
+Entrada:
+- dataIso (string no formato YYYY-MM-DD)
+
+Saída:
+- Date (com horário zerado em 00:00:00)
+
+Objetivo:
+Garantir comparações de data confiáveis no contexto de PCP.
+
+--------------------------------------------------
+Função: diaDaSemana
+--------------------------------------------------
+Descrição:
+Retorna o dia da semana abreviado (DOM, SEG, TER, ...).
+
+Entrada:
+- dataIso (YYYY-MM-DD)
+
+Saída:
+- String representando o dia da semana
+
+Uso típico:
+- Exibição no board e colunas do planejamento.
+
+--------------------------------------------------
+Função: estaAtrasada
+--------------------------------------------------
+Descrição:
+Verifica se uma ordem está atrasada em relação à data atual.
+
+Regra de negócio:
+- Considera apenas o dia (ignora horas)
+- Retorna true somente se dataEntrega < hoje
+
+Entrada:
+- Objeto contendo dataEntrega
+
+Saída:
+- Boolean
+
+--------------------------------------------------
+Função: diasDeAtraso
+--------------------------------------------------
+Descrição:
+Calcula o número de dias completos de atraso de uma ordem.
+
+Regras:
+- Diferença inteira de dias
+- Nunca retorna valor negativo
+
+Entrada:
+- Objeto contendo dataEntrega
+
+Saída:
+- Número inteiro
+
+Exemplos:
+- Entrega hoje → 0
+- Entrega ontem → 1
+- Entrega há 5 dias → 5
+
+--------------------------------------------------
+Função: nivelDeAtraso
+--------------------------------------------------
+Descrição:
+Classifica o nível de atraso de uma ordem.
+
+Classificação:
+- 0 dias  → "ok"
+- 1 dia   → "leve"
+- 2 a 4   → "medio"
+- >= 5    → "critico"
+
+Entrada:
+- Objeto contendo dataEntrega
+
+Saída:
+- String representando o nível de atraso
+
+--------------------------------------------------
+Função: ordenarPorPrioridade
+--------------------------------------------------
+Descrição:
+Ordena uma lista de ordens com base no nível de atraso,
+priorizando ordens mais críticas.
+
+Características:
+- Não altera o array original
+- Baseada em pesos por nível de atraso
+
+Pesos:
+- critico → 3
+- medio   → 2
+- leve    → 1
+- ok      → 0
+
+Entrada:
+- Array de ordens
+
+Saída:
+- Novo array ordenado por prioridade
+
+--------------------------------------------------
+Função: calcularCapacidadePercentual
+--------------------------------------------------
+Descrição:
+Calcula o percentual de utilização da capacidade produtiva total.
+
+Regra atual:
+- Soma o tempo de todas as ordens
+- Divide por uma capacidade fixa (40 horas)
+- Retorna o percentual utilizado
+
+Entrada:
+- Array de ordens
+
+Saída:
+- Número percentual
+
+Observação:
+Esta métrica é considerada MACRO e não indica
+onde ocorre o gargalo produtivo.
+
+--------------------------------------------------
+Função: capacidadePorDia
+--------------------------------------------------
+Descrição:
+Calcula a utilização de capacidade produtiva por dia.
+
+Regras:
+- Agrupa ordens pela data
+- Soma horas planejadas por dia
+- Compara com a capacidade diária padrão (8h)
+
+Entrada:
+- Array de ordens
+- Capacidade diária (default = 8 horas)
+
+Saída:
+- Objeto indexado por data contendo:
+  - horas planejadas
+  - capacidade diária
+  - percentual de utilização
+  - excesso de horas
+
+Objetivo:
+Permitir identificação clara de sobrecarga diária.
+
+--------------------------------------------------
+Função: capacidadePorMaquinaEDia
+--------------------------------------------------
+Descrição:
+Calcula a utilização de capacidade por máquina em cada dia.
+
+Regras:
+- Agrupa ordens por data e máquina
+- Aplica capacidade diária específica por máquina
+- Identifica gargalos produtivos
+
+Entrada:
+- Array de ordens
+- Objeto opcional com capacidade diária por máquina
+
+Saída:
+- Objeto hierárquico:
+  data → máquina → indicadores de capacidade
+
+Indicadores calculados:
+- horas planejadas
+- capacidade disponível
+- percentual de utilização
+- excesso de horas
+
+Objetivo:
+Identificar gargalos reais no chão de fábrica.
+
+--------------------------------------------------
+Função: contarAtrasadas
+--------------------------------------------------
+Descrição:
+Conta quantas ordens estão atrasadas.
+
+Entrada:
+- Array de ordens
+
+Saída:
+- Número inteiro
+
+--------------------------------------------------
+Função: contarAtrasoCritico
+--------------------------------------------------
+Descrição:
+Conta quantas ordens estão em atraso crítico.
+
+Entrada:
+- Array de ordens
+
+Saída:
+- Número inteiro
+
+==================================================
+CONSIDERAÇÕES DE ARQUITETURA
+==================================================
+
+- Este arquivo representa o domínio do PCP
+- Não depende de backend ou ERP
+- Pode ser testado isoladamente
+- Facilita manutenção e evolução
+- Suporta crescimento do sistema sem refatoração pesada
+
+==================================================
+EVOLUÇÕES FUTURAS PREVISTAS
+==================================================
+
+- Capacidade por setor
+- Capacidade por turno
+- Simulação de replanejamento
+- Ajustes manuais de capacidade
+- Integração com dados reais de ERP
+
+==================================================
+FIM DO DOCUMENTO
+==================================================

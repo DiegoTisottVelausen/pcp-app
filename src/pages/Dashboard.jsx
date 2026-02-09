@@ -1,46 +1,73 @@
 import { useEffect, useState } from "react"
-import {
-  carregarOrdensErp,
-  carregarPcp,
-  salvarPcp
-} from "../services/pcpService"
-
-import {
-  calcularCapacidadePercentual,
-  contarAtrasadas,
-  contarAtrasoCritico
-} from "../utils/pcpCalculations"
-
+import { carregarOrdensErp, carregarPcp, salvarPcp } from "../services/pcpService"
+import { calcularCapacidadePercentual, contarAtrasadas, contarAtrasoCritico, capacidadePorDia, capacidadePorMaquinaEDia } from "../utils/pcpCalculations"
 import Board from "../components/board/Board"
 import KpiRow from "../components/kpi/KpiRow"
 
 export default function Dashboard() {
+  
+  const [ordensOriginais, setOrdensOriginais] = useState([])
   const [ordens, setOrdens] = useState([])
   const [mensagem, setMensagem] = useState("")
   const [dataBaseSemana, setDataBaseSemana] = useState("2026-02-02")
+  const capacidadeDia = capacidadePorDia(ordens)
+  const capacidadeMaquina = capacidadePorMaquinaEDia(ordens)
+  const existeSimulacao = ordens.some(o => o.origem === "simulado")
+ 
+  function descartarSimulacao() {
+    setOrdens(ordensOriginais)
+  }
+
+
+  async function confirmarSimulacao() {
+    const confirmadas = ordens.map(o =>
+      o.origem === "simulado"
+        ? { ...o, origem: "pcp" }
+        : o
+    )
+
+    await salvarPcp(confirmadas)
+
+    setOrdens(confirmadas)
+    setOrdensOriginais(confirmadas)
+  }
+
+
 
   useEffect(() => {
-    async function init() {
+  async function init() {
+    try {
       const erp = await carregarOrdensErp()
       const pcp = await carregarPcp()
 
+      const erpFormatado = erp.map(o => ({
+        id: o.ordem_id,
+        produto: o.produto,
+        operacao: o.operacao,
+        maquina: o.maquina,
+        tempo: o.tempo,
+        dataEntrega: o.data,
+        origem: "erp"
+      }))
+
       if (pcp.length > 0) {
         setOrdens(pcp)
+        setOrdensOriginais(pcp)
       } else {
-        setOrdens(
-          erp.map(o => ({
-            id: o.id,
-            produto: o.produto,
-            operacao: o.operacao,
-            tempo: o.horas,
-            dataEntrega: o.dataEntrega,
-            origem: "erp"
-          }))
-        )
+        setOrdens(erpFormatado)
+        setOrdensOriginais(erpFormatado)
       }
+
+    } catch (erro) {
+      console.error("Erro ao carregar dados:", erro)
+      setMensagem("Erro ao conectar com backend")
     }
-    init()
-  }, [])
+  }
+
+  init()
+}, [])
+
+
 
   useEffect(() => {
     if (ordens.length) salvarPcp(ordens)
@@ -49,6 +76,19 @@ export default function Dashboard() {
   return (
     <div style={{ padding: 24 }}>
       <h1>PCP</h1>
+
+      {existeSimulacao && (
+        <div className="simulacao-actions">
+          <button onClick={confirmarSimulacao}>
+            Confirmar simulação
+          </button>
+
+          <button onClick={descartarSimulacao}>
+            Descartar simulação
+          </button>
+        </div>
+      )}
+
 
       <KpiRow
         capacidade={calcularCapacidadePercentual(ordens)}
@@ -63,9 +103,9 @@ export default function Dashboard() {
       <Board
         ordens={ordens}
         setOrdens={setOrdens}
-        setMensagem={setMensagem}
-        dataBaseSemana={dataBaseSemana}
+        onDragEnd={(novas) => setOrdens(novas)}
       />
+
     </div>
   )
 }

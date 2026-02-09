@@ -1,27 +1,29 @@
-// Detecta automaticamente ambiente
-const API =
-  import.meta.env.PROD
-    ? "https://pcp-app-backend.onrender.com"
-    : "http://localhost:3001"
+const API_URL = "http://localhost:10000"
+
+export async function carregarOrdensErp() {
+  const res = await fetch(`${API_URL}/erp`)
+  return res.json()
+}
 
 export async function carregarPcp() {
-  const res = await fetch(`${API}/pcp`)
-  if (!res.ok) throw new Error("Erro ao carregar PCP")
+  const res = await fetch(`${API_URL}/pcp`)
   return res.json()
 }
 
 export async function salvarPcp(ordens) {
-  const res = await fetch(`${API}/pcp`, {
+  await fetch(`${API_URL}/pcp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(ordens),
+    body: JSON.stringify({
+      versao: new Date().toISOString(),
+      origem: "simulacao",
+      ordens
+    })
   })
-  if (!res.ok) throw new Error("Erro ao salvar PCP")
 }
 
-export async function carregarOrdensErp() {
-  const res = await fetch(`${API}/erp/ordens`)
-  if (!res.ok) throw new Error("Erro ao carregar ERP")
+export async function carregarHistoricoPcp() {
+  const res = await fetch("http://localhost:10000/pcp/versoes")
   return res.json()
 }
 

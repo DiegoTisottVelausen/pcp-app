@@ -38,3 +38,43 @@ body {
   }
 }
 
+.badge-simulacao {
+  background: orange;
+  color: #000;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.tooltip-trigger {
+  cursor: pointer;
+  font-weight: bold;
+  color: #aaa;
+}
+
+.tooltip-content {
+  display: none;
+  position: absolute;
+  top: 20px;
+  left: 0;
+  background: #222;
+  color: #fff;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  min-width: 160px;
+  z-index: 10;
+}
+
+.tooltip:hover .tooltip-content {
+  display: block;
+}
+

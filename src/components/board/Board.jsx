@@ -1,52 +1,63 @@
-import { DndContext, pointerWithin } from "@dnd-kit/core"
+import { DragDropContext } from "@hello-pangea/dnd"
 import Column from "./Column"
 
-function gerarSemana(dataBase) {
-  const base = new Date(`${dataBase}T12:00:00`)
-  const dia = base.getDay()
-  const diff = dia === 0 ? -6 : 1 - dia
-  base.setDate(base.getDate() + diff)
-
-  return Array.from({ length: 5 }, (_, i) => {
-    const d = new Date(base)
-    d.setDate(base.getDate() + i)
-    return d.toISOString().slice(0, 10)
-  })
+/**
+ * Gera lista de dias únicos ordenados
+ */
+function gerarSemana(ordens) {
+  const datas = [...new Set(ordens.map(o => o.data))]
+  return datas.sort()
 }
 
-export default function Board({ ordens, setOrdens, setMensagem, dataBaseSemana }) {
-  const semana = gerarSemana(dataBaseSemana)
+/**
+ * Filtra ordens por data
+ */
+function filtrarPorData(ordens, data) {
+  return ordens.filter(o => o.data === data)
+}
 
-  function handleDragEnd(event) {
-    const { active, over } = event
-    if (!over) return
+export default function Board({
+  ordens,
+  setOrdens,
+  onDragEnd
+}) {
 
-    const novaData = over.id
+  const datasSemana = gerarSemana(ordens)
 
-    setOrdens(prev =>
-      prev.map(o =>
-        o.id === active.id
-          ? { ...o, dataEntrega: novaData, origem: "manual" }
-          : o
-      )
+  /**
+   * Drag finalizado
+   */
+  function handleDragEnd(result) {
+    if (!result.destination) return
+
+    const { draggableId, destination } = result
+    const novaData = destination.droppableId
+
+    const novasOrdens = ordens.map(o =>
+      o.id === draggableId
+        ? { ...o, data: novaData, origem: "simulado" }
+        : o
     )
+
+    setOrdens(novasOrdens)
+
+    // dispara callback pro Dashboard recalcular KPIs
+    if (onDragEnd) onDragEnd(novasOrdens)
   }
 
   return (
-    <DndContext
-      collisionDetection={pointerWithin}
-      onDragEnd={handleDragEnd}
-    >
+    <DragDropContext onDragEnd={handleDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
-        {semana.map(data => (
+        {datasSemana.map(data => (
           <Column
             key={data}
             data={data}
-            droppableId={data}
-            ordens={ordens.filter(o => o.dataEntrega === data)}
+            ordens={filtrarPorData(ordens, data)}
           />
         ))}
       </div>
-    </DndContext>
+    </DragDropContext>
   )
 }
+
+

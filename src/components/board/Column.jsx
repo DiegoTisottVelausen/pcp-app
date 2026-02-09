@@ -1,35 +1,40 @@
-import { useDroppable } from "@dnd-kit/core"
-import Card from "./Card"
-import { ordenarPorPrioridade } from "../../utils/pcpCalculations"
+import { Droppable, Draggable } from "@hello-pangea/dnd"
+import Card from "../card/Card"
 
-export default function Column({ dia, data, droppableId, ordens, modoTv }) {
-  const { setNodeRef, isOver } = useDroppable({ id: droppableId })
-
-  console.log("📦 Render coluna:", data, ordens.length)
-
-  const ordenadas = ordenarPorPrioridade(ordens)
-
+export default function Column({ data, ordens }) {
   return (
-    <div
-      ref={setNodeRef}
-      style={{
-        width: 220,
-        minHeight: 300,
-        padding: 8,
-        borderRadius: 8,
-        border: "2px solid #444",
-        background: isOver ? "#1f2933" : "#111",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8
-      }}
-    >
-      <strong>{dia}</strong>
-      <small>{data}</small>
+    <div className="column">
+      <h3>{data}</h3>
 
-      {ordenadas.map(ordem => (
-        <Card key={ordem.id} {...ordem} modoTv={modoTv} />
-      ))}
+      <Droppable droppableId={data}>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="column-body"
+          >
+            {ordens.map((ordem, index) => (
+              <Draggable
+                key={ordem.id}
+                draggableId={ordem.id}
+                index={index}
+              >
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                  >
+                    <Card ordem={ordem} />
+                  </div>
+                )}
+              </Draggable>
+            ))}
+
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     </div>
   )
 }

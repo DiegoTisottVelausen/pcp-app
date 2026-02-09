@@ -1,17 +1,18 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Dashboard from "./pages/Dashboard"
+import HistoricoPcp from "./pages/HistoricoPcp"
+import Execucao from "./pages/Execucao"
 
-export default function App() {
+function App() {
   return (
-    <div
-      style={{
-        maxWidth: 1400,
-        margin: "0 auto",
-        padding: "24px 32px",
-        fontFamily: "Inter, system-ui, sans-serif"
-      }}
-    >
-      <Dashboard />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/historico" element={<HistoricoPcp />} />
+        <Route path="/execucao" element={<Execucao />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
+export default App
