@@ -136,10 +136,11 @@ export default function Dashboard() {
       {/* 🧱 BOARD */}
       <Board
         ordens={ordens}
-        setOrdens={setOrdens}
+        capacidadePorDia={capacidadeDia}
+        capacidadePorMaquinaEDia={capacidadeMaquina}
         onDragEnd={onDragEnd}
-        dataBaseSemana={dataBaseSemana}
       />
+
     </div>
   )
 }
