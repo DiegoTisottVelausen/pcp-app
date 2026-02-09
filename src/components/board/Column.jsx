@@ -1,5 +1,5 @@
 import { Droppable, Draggable } from "@hello-pangea/dnd"
-import Card from "../card/Card"
+import Card from "./Card.jsx"
 
 export default function Column({ data, ordens }) {
   return (

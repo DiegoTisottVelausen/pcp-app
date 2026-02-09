@@ -2,7 +2,7 @@ import { DragDropContext } from "@hello-pangea/dnd"
 import Column from "./Column"
 
 /**
- * Gera dias únicos da semana
+ * Gera lista de dias únicos ordenados
  */
 function gerarSemana(ordens) {
   const datas = [...new Set(ordens.map(o => o.dataEntrega))]
@@ -18,37 +18,27 @@ function filtrarPorData(ordens, data) {
 
 export default function Board({
   ordens,
-  setOrdens,
   capacidadePorDia,
   capacidadePorMaquinaEDia,
   onDragEnd
 }) {
-
-  const dataSemana = gerarSemana(ordens)
+  const datasSemana = gerarSemana(ordens)
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
-
-        {dataSemana.map(data => {
-
-          const ordensDia = filtrarPorData(ordens, data)
-
-          return (
-            <Column
-              key={data}
-              data={data}
-              droppableId={data}
-              ordens={ordensDia}
-              capacidadeDia={capacidadePorDia?.[data] || 0}
-              capacidadeMaquinas={capacidadePorMaquinaEDia?.[data] || {}}
-            />
-          )
-        })}
+        
+        {datasSemana.map(data => (
+          <Column
+            key={data}
+            data={data}
+            ordens={filtrarPorData(ordens, data)}
+            capacidadeDia={capacidadePorDia?.[data]}
+            capacidadeMaquinas={capacidadePorMaquinaEDia?.[data]}
+          />
+        ))}
 
       </div>
     </DragDropContext>
   )
 }
-
-
