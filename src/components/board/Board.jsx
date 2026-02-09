@@ -2,59 +2,50 @@ import { DragDropContext } from "@hello-pangea/dnd"
 import Column from "./Column"
 
 /**
- * Gera lista de dias únicos ordenados
+ * Gera dias únicos da semana
  */
 function gerarSemana(ordens) {
-  const datas = [...new Set(ordens.map(o => o.data))]
+  const datas = [...new Set(ordens.map(o => o.dataEntrega))]
   return datas.sort()
 }
 
 /**
- * Filtra ordens por data
+ * Filtra ordens por dia
  */
 function filtrarPorData(ordens, data) {
-  return ordens.filter(o => o.data === data)
+  return ordens.filter(o => o.dataEntrega === data)
 }
 
 export default function Board({
   ordens,
   setOrdens,
+  capacidadePorDia,
+  capacidadePorMaquinaEDia,
   onDragEnd
 }) {
 
-  const datasSemana = gerarSemana(ordens)
-
-  /**
-   * Drag finalizado
-   */
-  function handleDragEnd(result) {
-    if (!result.destination) return
-
-    const { draggableId, destination } = result
-    const novaData = destination.droppableId
-
-    const novasOrdens = ordens.map(o =>
-      o.id === draggableId
-        ? { ...o, data: novaData, origem: "simulado" }
-        : o
-    )
-
-    setOrdens(novasOrdens)
-
-    // dispara callback pro Dashboard recalcular KPIs
-    if (onDragEnd) onDragEnd(novasOrdens)
-  }
+  const dataSemana = gerarSemana(ordens)
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd}>
       <div style={{ display: "flex", gap: 16 }}>
-        {datasSemana.map(data => (
-          <Column
-            key={data}
-            data={data}
-            ordens={filtrarPorData(ordens, data)}
-          />
-        ))}
+
+        {dataSemana.map(data => {
+
+          const ordensDia = filtrarPorData(ordens, data)
+
+          return (
+            <Column
+              key={data}
+              data={data}
+              droppableId={data}
+              ordens={ordensDia}
+              capacidadeDia={capacidadePorDia?.[data] || 0}
+              capacidadeMaquinas={capacidadePorMaquinaEDia?.[data] || {}}
+            />
+          )
+        })}
+
       </div>
     </DragDropContext>
   )
